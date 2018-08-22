@@ -84,7 +84,7 @@ app.get('/.well-known/webfinger', (req, res) => {
 				{
 					"rel": "http://webfinger.net/rel/profile-page",
 					"type": "text/html",
-					"href": `${domain}/@${username}`
+					"href": `twitter.com/@${username}`
 				},
 				// {
 				// 	"rel": "http://schemas.google.com/g/2010#updates-from",

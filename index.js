@@ -102,6 +102,15 @@ signatureValue: 'Wh0v2QugV7OJV1ON4pKBD4yEtlMy6QSyx6ZBR9jesMz7sjbjsRznDlhnKcHe4/U
 		return;
 	}
 
+	var parsed = httpSignature.parseRequest(req);
+	var pub = req.body.signatureValue;
+	console.log('HEADERS:', req.headers);
+	if (!httpSignature.verifySignature(parsed, pub)) {
+		console.log('Invalid http signature I think!');
+		res.status(500).end();
+		return;
+	}
+
 	if (req.body.type === 'Follow') {
 		let userToAdd = req.body.object.split('/')
 		userToAdd = userToAdd[userToAdd.length - 1];

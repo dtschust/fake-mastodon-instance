@@ -22,7 +22,7 @@ app.get('/.well-known/host-meta', (req, res) => {
 
 app.get('/users/:username', (req,res) => {
 	const username = req.params.username;
-	console.log(req.path, `username ${req.params.username} requested!`);
+	console.log(req.path, `username ${req.params.username} requested!`, req.query, req.body);
 	res.json({
 		"preferredUsername": username,
 		"name": "Drew Schuster (hardcoded)",

@@ -103,8 +103,17 @@ signatureValue: 'Wh0v2QugV7OJV1ON4pKBD4yEtlMy6QSyx6ZBR9jesMz7sjbjsRznDlhnKcHe4/U
 	}
 
 	console.log('HEADERS:', req.headers);
-	// var parsed = httpSignature.parseRequest(req);
-	// var pub = req.body.signatureValue;
+	// 'keyId="https://xoxo.zone/users/nuncamind#main-key",algorithm="rsa-sha256",headers="(request-target) user-agent host date accept-encoding digest content-type",signature="oTwNkVRCQhTC5aASK86qd8uZbKug1qr4SaMfPdWNQzX5cxD4gan+K49GyZXb2FLUQvf2KaxXCujsO3yIDlGnD3A87JgRJVsmvNFZU7ftchngaYEHGDS7402WHRXBReSZjwThCB2O2vaZT6wN5ojDSgVAS8NvjZWDmZNe8RPaDib0MuQC+6KSuOSfw6e7Rq/8caDAfarQ6p4JG1uj/05DtbguPKa6hmtVK2IrdJcXgbcJQ4ScIIhwwkAIKD0Sxw1hXceWVj6b82pvLEKjQr3ix7B6gwCSuaUwk7cuganzLFllDjoDHiQdmjlTd3gqOgppmtg2VTu0mg851cim9NsVDg=="'
+
+	// const signatureHeader = req.headers.Signature.split(',');
+	// const keyId = signatureHeader[0].split('=')[1].slice(1, -1);
+	// const headers = signatureHeader[2].split('=')[1].slice(1, -1);
+	// const signature = atob(signatureHeader[3].split('=')[1].slice(1, -1));
+	req.headers.signature = req.headers.authorization;
+	req.headers.signature = req.headers.signature.slice('Signature: '.length);
+	console.log('req.headers.signature', req.headers.signature);
+	var parsed = httpSignature.parseRequest(req);
+	// // var pub = req.body.signatureValue;
 	// if (!httpSignature.verifySignature(parsed, pub)) {
 	// 	console.log('Invalid http signature I think!');
 	// 	res.status(500).end();
@@ -199,7 +208,7 @@ app.get('/.well-known/webfinger', (req, res) => {
 				// 	"href": `${domain}/api/salmon/37322` // TODO get an id?
 				// },
 				{
-					"rel": "magic-public-key", // TODO get a real public keye
+					"rel": "magic-public-key", // TODO get a real public key
 					"href": "data:application/magic-public-key,RSA.ouYy9P4LLbEzzCNCtevEIcFbobS3USLNIRSUawGe2wuWLI8CPuRfN5Fz4ZTPfWytqwFDbF5ff4zkteizolNKJEMmMT1TD1K8SZk1lp0hvpuDK-vp8XioxVXHkyaN4JxbMRQqG62kozvB5LQvFvomMQRgQTSSjvYb7VMWbF5m6y0=.AQAB",
 				},
 				// {

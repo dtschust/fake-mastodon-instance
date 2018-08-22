@@ -9,6 +9,17 @@ const domain = process.env.DOMAIN;
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+app.get('/.well-known/host-meta', (req, res) => {
+	const xml = `<?xml version='1.0' encoding='UTF-8'?>
+<XRD xmlns='http://docs.oasis-open.org/ns/xri/xrd-1.0'>
+  <Link rel='lrdd' type='application/json'
+        template='https://bridgy-federated.appspot.com/.well-known/webfinger?resource={uri}' />
+</XRD>`;
+	res.status(200);
+	res.type('application/xml');
+	res.send(xml);
+});
+
 app.get('/.well-known/webfinger', (req, res) => {
 	const account = req.query.resource.slice(5);
 	const username = account.split('@')[0];

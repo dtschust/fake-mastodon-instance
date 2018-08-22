@@ -17,6 +17,7 @@
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.4",
     "mongoose": "^4.11.12",
-    "puppeteer": "^1.7.0"
+    "puppeteer": "^1.7.0",
+    "twit": "^2.2.11"
   }
 }

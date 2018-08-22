@@ -33,9 +33,6 @@ app.get('/users/:username', (req,res) => {
 				"type": "Image"
 			}
 		],
-		// "publicKey": {
-		// 	"publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDfEICazUKIiP+vAq4gu4DrRUyh\n6YR4xNBt9R3KSPCV3a+wi0uRZ1x+dV8+KLv2SHpBQ9Yn3V/1+uLpxa+beXD2b7ZT\nZ+oXw3iH8RteE2JXehIgvUUQQJZr/8jGVUkYYsliEB5X2Pk67puhA6tgjr5UK0tQ\n1ZvEKzcgeSrRRBDgRwIDAQAB\n-----END PUBLIC KEY-----"
-		// },
 		"inbox": `${domain}/users/${username}/inbox`,
 		"@context": "https://www.w3.org/ns/activitystreams",
 		"type": "Person",

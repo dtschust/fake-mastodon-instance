@@ -20,6 +20,33 @@ app.get('/.well-known/host-meta', (req, res) => {
 	res.send(xml);
 });
 
+app.get('/users/:username', (req,res) => {
+	res.json({
+		"preferredUsername": "miklb.com",
+		"name": "Michael Bishop",
+		"url": "https://miklb.com/",
+		"image": [
+			{
+				"url": "https://miklb.com/pagespeed_static/1.JiBnMqyl6S.gif",
+				"type": "Image"
+			}
+		],
+		"publicKey": {
+			"publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDfEICazUKIiP+vAq4gu4DrRUyh\n6YR4xNBt9R3KSPCV3a+wi0uRZ1x+dV8+KLv2SHpBQ9Yn3V/1+uLpxa+beXD2b7ZT\nZ+oXw3iH8RteE2JXehIgvUUQQJZr/8jGVUkYYsliEB5X2Pk67puhA6tgjr5UK0tQ\n1ZvEKzcgeSrRRBDgRwIDAQAB\n-----END PUBLIC KEY-----"
+		},
+		"inbox": "https://fed.brid.gy/miklb.com/inbox",
+		"@context": "https://www.w3.org/ns/activitystreams",
+		"type": "Person",
+		"id": "https://fed.brid.gy/miklb.com",
+		"icon": [
+			{
+				"url": "https://miklb.com/pagespeed_static/1.JiBnMqyl6S.gif",
+				"type": "Image"
+			}
+		]
+	});
+})
+
 app.get('/.well-known/webfinger', (req, res) => {
 	const account = req.query.resource.slice(5);
 	const username = account.split('@')[0];
@@ -40,11 +67,11 @@ app.get('/.well-known/webfinger', (req, res) => {
 					"type": "text/html",
 					"href": `${domain}/@${username}`
 				},
-				{
-					"rel": "http://schemas.google.com/g/2010#updates-from",
-					"type": "application/atom+xml",
-					"href": `${domain}/users/${username}.atom`
-				},
+				// {
+				// 	"rel": "http://schemas.google.com/g/2010#updates-from",
+				// 	"type": "application/atom+xml",
+				// 	"href": `${domain}/users/${username}.atom`
+				// },
 				{
 					"rel": "self",
 					"type": "application/activity+json",

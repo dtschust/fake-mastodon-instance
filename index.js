@@ -29,7 +29,7 @@ app.get('/.well-known/webfinger', (req, res) => {
 	}
 	res.json(
 		{
-			"subject": req.query,
+			"subject": req.query.resource,
 			"aliases": [
 				`${domain}/@${username}`,
 				`${domain}/users/${username}`

@@ -2,7 +2,9 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const Twit = require('twit')
+const Twit = require('twit');
+const https = require('https');
+const httpSignature = require('http-signature');
 
 const T = new Twit({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -17,6 +19,34 @@ const T = new Twit({
 const app = express();
 
 const domain = process.env.DOMAIN;
+
+const key = process.env.INSTANCE_PUBLIC_KEY;
+const cert = process.env.INSTANCE_PRIVATE_KEY;
+
+// TODO: Here's how to make a signed request I think
+/*
+var options = {
+	host: 'localhost',
+	port: 8443,
+	path: '/',
+	method: 'GET',
+	headers: {}
+};
+
+// Adds a 'Date' header in, signs it, and adds the
+// 'Authorization' header in.
+var req = https.request(options, function (res) {
+	console.log(res.statusCode);
+});
+
+
+httpSignature.sign(req, {
+	key: key,
+	keyId: './cert.pem'
+});
+
+req.end();
+*/
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

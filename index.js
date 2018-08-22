@@ -43,10 +43,10 @@ app.get('/.well-known/webfinger', (req, res) => {
 					"rel": "salmon",
 					"href": `${domain}/api/salmon/37322` // TODO get an id?
 				},
-				{
-					"rel": "magic-public-key", // TODO get a real public keye
-					"href": "data:application/magic-public-key,RSA.ylb7bBHJa_oOwsfP-fTxgYNA7mfTAFCtn8XDXxf-2TCWIT8uYEmEVMWzflXRzvBurB4h8Ap4dpe_6JyGGslXTaTW1AyPWdQ7MNF1wNg5vuE-YhvAXGwJFoMJx-pbZpAq-3pZCOnnSB_njRZ-V4ciPNLJvHu0V9kPtwaYssQhRXqOIxhje_tsNt6JMpki7bgWUy2eQIcas8M3nA6hlLPbsdlWIcOkdW7J4y2a-_xmBAoIMuWZz-rvQAAI5Dzk_V2SctH6TH9TN8q1lEg3YigFeXdGrQc8oIiMdQwzVipbK1BZTz9h3TmPW1uzH4slA2m_IwnKvjua_hceKN9n3ULfVw==.AQAB"
-				},
+				// {
+				// 	"rel": "magic-public-key", // TODO get a real public keye
+				// 	"href": "data:application/magic-public-key,RSA.ylb7bBHJa_oOwsfP-fTxgYNA7mfTAFCtn8XDXxf-2TCWIT8uYEmEVMWzflXRzvBurB4h8Ap4dpe_6JyGGslXTaTW1AyPWdQ7MNF1wNg5vuE-YhvAXGwJFoMJx-pbZpAq-3pZCOnnSB_njRZ-V4ciPNLJvHu0V9kPtwaYssQhRXqOIxhje_tsNt6JMpki7bgWUy2eQIcas8M3nA6hlLPbsdlWIcOkdW7J4y2a-_xmBAoIMuWZz-rvQAAI5Dzk_V2SctH6TH9TN8q1lEg3YigFeXdGrQc8oIiMdQwzVipbK1BZTz9h3TmPW1uzH4slA2m_IwnKvjua_hceKN9n3ULfVw==.AQAB"
+				// },
 				{
 					"rel": "http://ostatus.org/schema/1.0/subscribe",
 					"template": `${domain}/authorize_follow?acct={uri}`

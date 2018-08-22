@@ -31,6 +31,11 @@ app.use(bodyParser.json());
 // 	res.send(xml);
 // });
 
+app.post('/inbox', (req, res) => {
+	console.log('got an inbox post!', req.body);
+	res(500).end();
+});
+
 app.get('/users/:username', (req,res) => {
 	// TODO: cache these profiles.
 	// TODO: figure out how to invalidate caches for profiles as well, the other instances have their own caches

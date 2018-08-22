@@ -1,3 +1,4 @@
+// TODO: prettier
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -33,7 +34,57 @@ app.use(express.json({ type: ['application/json', 'application/activity+json', '
 // });
 
 app.post('/inbox', (req, res) => {
-	console.log('got an inbox post!', req.body, req.params);
+	console.log('got an inbox post!', req.body);
+	/* looks like this:
+	{ '@context':
+[ 'https://www.w3.org/ns/activitystreams',
+'https://w3id.org/security/v1',
+{ manuallyApprovesFollowers: 'as:manuallyApprovesFollowers',
+sensitive: 'as:sensitive',
+movedTo: 'as:movedTo',
+Hashtag: 'as:Hashtag',
+ostatus: 'http://ostatus.org#',
+atomUri: 'ostatus:atomUri',
+inReplyToAtomUri: 'ostatus:inReplyToAtomUri',
+conversation: 'ostatus:conversation',
+toot: 'http://joinmastodon.org/ns#',
+Emoji: 'toot:Emoji',
+focalPoint: [Object],
+featured: 'toot:featured',
+schema: 'http://schema.org#',
+PropertyValue: 'schema:PropertyValue',
+value: 'schema:value' } ],
+id: 'https://xoxo.zone/bafe132d-a7c0-4a4b-8096-3abeca56011a',
+type: 'Follow',
+actor: 'https://xoxo.zone/users/nuncamind',
+object: 'https://fake-mastodon-instance.herokuapp.com/users/burgerking',
+signature:
+{ type: 'RsaSignature2017',
+creator: 'https://xoxo.zone/users/nuncamind#main-key',
+created: '2018-08-22T20:46:14Z',
+signatureValue: 'Wh0v2QugV7OJV1ON4pKBD4yEtlMy6QSyx6ZBR9jesMz7sjbjsRznDlhnKcHe4/UZZ9iYJyCLaIfGzzsGPSGGmhTP04dd/ENj0KvdZACMB9bmIMMJMAqSXL8vALHMYsP+4jDnT5pKH3JVS+zs7k6fc6mvvxt2PrJdnLSfSTzE6ABU5WIX1Hc5PJsOepSUCILjO8PWoaNRF72WbkMZ8okb5MYL4niEyWaRfhZ/pkjZ5oLvH9oZ+Z1uoDXYK3O3tK8fcs3YbHzQaZd9ipSjWZ32wz34YdA/iKcUsuUmbDq5YTrWXXMxAOV229rKq8wdfhv49pdU7XTe7EXq+AoeGotiEA==' } }
+	*/
+	// TODO: verify signature or whatever.
+
+	// Ignore anything that doesn't come from my account, hardcoded for now
+	if (req.body.actor !== 'https://xoxo.zone/users/nuncamind') {
+		res.status(500).end();
+		return;
+	}
+
+	if (req.body.type === 'Follow') {
+		let userToAdd = req.body.object.split('/')
+		userToAdd = userToAdd[userToAdd.length - 1];
+		// TODO: send "Accept" type event. Find out how it's formatted by trying to follow and unfollow
+		// TODO: Add this user to the list of followers, update the database.
+		// TODO: Maybe manually trigger a crawl of this user instead of waiting for the crawler
+	} else if (req.body.type === 'Unfollow') {
+		let userToRemove = req.body.object.split('/')
+		userToRemove = userToAdd[userToAdd.length - 1];
+		// TODO: send "Accept" type event. Find out how it's formatted by trying to follow and unfollow
+		// TODO: Remove this user from the list of followers, update the database.
+
+	}
 	res.status(500).end();
 });
 

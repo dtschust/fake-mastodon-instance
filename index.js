@@ -1,6 +1,17 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
+const Twit = require('twit')
+
+const T = new Twit({
+  consumer_key: process.env.TWITTER_CONSUMER_KEY,
+  consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
+  access_token: process.env.TWITTER_ACCESS_TOKEN,
+  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+  timeout_ms: 60*1000,  // optional HTTP request timeout to apply to all requests.
+  strictSSL: true,     // optional - requires SSL certificates to be valid.
+});
+
 
 const app = express();
 
@@ -20,29 +31,62 @@ app.get('/.well-known/host-meta', (req, res) => {
 	res.send(xml);
 });
 
+// app.get('/users/:username', (req,res) => {
+// 	const username = req.params.username;
+// 	console.log(req.path, `username ${req.params.username} requested!`, req.query, req.body);
+// 	res.json({
+// 		"preferredUsername": username,
+// 		"name": "Drew Schuster (hardcoded)",
+// 		"url": `${domain}/@${username}`,
+// 		"image": [
+// 			{
+// 				"url": "https://xoxo.zone/system/accounts/avatars/000/037/322/original/009fec3fcfa521f5.jpg",
+// 				"type": "Image"
+// 			}
+// 		],
+// 		"inbox": `${domain}/users/${username}/inbox`,
+// 		"@context": "https://www.w3.org/ns/activitystreams",
+// 		"type": "Person",
+// 		"id": `${domain}/users/${username}`,
+// 		"icon": [
+// 			{
+// 				"url": "https://xoxo.zone/system/accounts/avatars/000/037/322/original/009fec3fcfa521f5.jpg",
+// 				"type": "Image"
+// 			}
+// 		]
+// 	});
+// })
+
 app.get('/users/:username', (req,res) => {
 	const username = req.params.username;
 	console.log(req.path, `username ${req.params.username} requested!`, req.query, req.body);
-	res.json({
-		"preferredUsername": username,
-		"name": "Drew Schuster (hardcoded)",
-		"url": `${domain}/@${username}`,
-		"image": [
-			{
-				"url": "https://xoxo.zone/system/accounts/avatars/000/037/322/original/009fec3fcfa521f5.jpg",
-				"type": "Image"
-			}
-		],
-		"inbox": `${domain}/users/${username}/inbox`,
-		"@context": "https://www.w3.org/ns/activitystreams",
-		"type": "Person",
-		"id": `${domain}/users/${username}`,
-		"icon": [
-			{
-				"url": "https://xoxo.zone/system/accounts/avatars/000/037/322/original/009fec3fcfa521f5.jpg",
-				"type": "Image"
-			}
-		]
+	T.get('users/lookup', { screen_name: username }).then((result) => {
+		const data = result.data[0];
+		res.json({
+			"preferredUsername": username,
+			"name": `${data.name}`,
+			"summary": `${data.description}`,
+			"url": `${domain}/@${username}`,
+			"image": [
+				{
+					"url": `${data.profile_banner_url}`,
+					"type": "Image"
+				}
+			],
+			"inbox": `${domain}/users/${username}/inbox`,
+			"@context": "https://www.w3.org/ns/activitystreams",
+			"type": "Person",
+			"id": `${domain}/users/${username}`,
+			"icon": [
+				{
+					"url": `${data.profile_image_url.replace('_normal', '_400x400')}`,
+					"type": "Image"
+				}
+			]
+		});
+	}).catch((e) => {
+		console.log('Error', e);
+		res.status(500).end();
 	});
 })
 

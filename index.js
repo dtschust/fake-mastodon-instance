@@ -19,6 +19,7 @@ const domain = process.env.DOMAIN;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(express.json({ type: ['application/json', 'application/activity+json', 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"'] }))
 
 // app.get('/.well-known/host-meta', (req, res) => {
 // 	const xml = `<?xml version='1.0' encoding='UTF-8'?>

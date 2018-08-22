@@ -21,6 +21,7 @@ app.get('/.well-known/host-meta', (req, res) => {
 });
 
 app.get('/users/:username', (req,res) => {
+	console.log(req.path, `username ${req.params.username} requested!`);
 	res.json({
 		"preferredUsername": "miklb.com",
 		"name": "Michael Bishop",

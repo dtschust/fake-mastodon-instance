@@ -33,7 +33,7 @@ app.use(bodyParser.json());
 
 app.post('/inbox', (req, res) => {
 	console.log('got an inbox post!', req.body);
-	res(500).end();
+	res.status(500).end();
 });
 
 app.get('/users/:username', (req,res) => {

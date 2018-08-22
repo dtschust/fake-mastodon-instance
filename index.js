@@ -103,23 +103,25 @@ signatureValue: 'Wh0v2QugV7OJV1ON4pKBD4yEtlMy6QSyx6ZBR9jesMz7sjbjsRznDlhnKcHe4/U
 	}
 
 	console.log('HEADERS:', req.headers);
-	var parsed = httpSignature.parseRequest(req);
-	var pub = req.body.signatureValue;
-	if (!httpSignature.verifySignature(parsed, pub)) {
-		console.log('Invalid http signature I think!');
-		res.status(500).end();
-		return;
-	}
+	// var parsed = httpSignature.parseRequest(req);
+	// var pub = req.body.signatureValue;
+	// if (!httpSignature.verifySignature(parsed, pub)) {
+	// 	console.log('Invalid http signature I think!');
+	// 	res.status(500).end();
+	// 	return;
+	// }
 
 	if (req.body.type === 'Follow') {
 		let userToAdd = req.body.object.split('/')
 		userToAdd = userToAdd[userToAdd.length - 1];
+		console.log('wants to follow', userToAdd);
 		// TODO: send "Accept" type event. Find out how it's formatted by trying to follow and unfollow
 		// TODO: Add this user to the list of followers, update the database.
 		// TODO: Maybe manually trigger a crawl of this user instead of waiting for the crawler
 	} else if (req.body.type === 'Unfollow') {
 		let userToRemove = req.body.object.split('/')
-		userToRemove = userToAdd[userToAdd.length - 1];
+		userToRemove = userToRemove[userToAdd.length - 1];
+		console.log('wants to unfollow', userToRemove);
 		// TODO: send "Accept" type event. Find out how it's formatted by trying to follow and unfollow
 		// TODO: Remove this user from the list of followers, update the database.
 

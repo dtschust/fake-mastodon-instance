@@ -54,7 +54,7 @@ app.get('/users/:username', (req,res) => {
 					"type": "Image"
 				}
 			],
-			"inbox": `${domain}/users/${username}/inbox`,
+			"inbox": `${domain}/inbox`,
 			"@context": "https://www.w3.org/ns/activitystreams",
 			"type": "Person",
 			"id": `${domain}/users/${username}`,

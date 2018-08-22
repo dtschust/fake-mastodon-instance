@@ -32,7 +32,7 @@ app.use(bodyParser.json());
 // });
 
 app.post('/inbox', (req, res) => {
-	console.log('got an inbox post!', req.body);
+	console.log('got an inbox post!', req.body, req.params);
 	res.status(500).end();
 });
 

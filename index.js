@@ -109,10 +109,10 @@ signatureValue: 'Wh0v2QugV7OJV1ON4pKBD4yEtlMy6QSyx6ZBR9jesMz7sjbjsRznDlhnKcHe4/U
 	// const keyId = signatureHeader[0].split('=')[1].slice(1, -1);
 	// const headers = signatureHeader[2].split('=')[1].slice(1, -1);
 	// const signature = atob(signatureHeader[3].split('=')[1].slice(1, -1));
-	req.headers.signature = req.headers.authorization;
-	req.headers.signature = req.headers.signature.slice('Signature: '.length);
-	console.log('req.headers.signature', req.headers.signature);
-	var parsed = httpSignature.parseRequest(req);
+	// req.headers.signature = req.headers.authorization;
+	// req.headers.signature = req.headers.signature.slice('Signature: '.length);
+	// console.log('req.headers.signature', req.headers.signature);
+	// var parsed = httpSignature.parseRequest(req);
 	// // var pub = req.body.signatureValue;
 	// if (!httpSignature.verifySignature(parsed, pub)) {
 	// 	console.log('Invalid http signature I think!');

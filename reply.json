@@ -1,0 +1,15 @@
+{
+	"@context": "https://www.w3.org/ns/activitystreams",
+	"id": "https://fake-mastodon-instance.herokuapp.com/12345078900777",
+	"type": "Create",
+	"actor": "https://fake-mastodon-instance.herokuapp.com/users/nuncamind",
+	"object": {
+		"id": "https://fake-mastodon-instance.herokuapp.com/1234507891245777",
+		"type": "Note",
+		"published": "2018-08-23T20:22:38.748Z",
+		"attributedTo": "https://fake-mastodon-instance.herokuapp.com/users/nuncamind",
+		"inReplyTo": "https://mastodon.social/@nuncatest/100601481448028993",
+		"content": "<p>Test reply</p>",
+		"to": "https://www.w3.org/ns/activitystreams#Public"
+	}
+}

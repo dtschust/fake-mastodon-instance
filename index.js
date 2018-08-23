@@ -97,7 +97,7 @@ signatureValue: 'Wh0v2QugV7OJV1ON4pKBD4yEtlMy6QSyx6ZBR9jesMz7sjbjsRznDlhnKcHe4/U
 	// TODO: verify signature or whatever.
 
 	// Ignore anything that doesn't come from my account, hardcoded for now
-	if (req.body.actor !== 'https://xoxo.zone/users/nuncamind') {
+	if (req.body.actor !== 'https://mastodon.social/users/nuncatest') {
 		res.status(500).end();
 		return;
 	}

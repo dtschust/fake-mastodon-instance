@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const express = require('express');
 const bodyParser = require('body-parser');
 const Twit = require('twit');
+const sendMessage = require('./send-message');
 
 const T = new Twit({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -191,6 +192,7 @@ app.get('*', (req, res) => {
 
 app.listen(process.env.PORT || 3000);
 
+/*
 function sendMessage(message, name, destinationDomain, cb) {
 	const signer = crypto.createSign('sha256');
 	let d = new Date();
@@ -220,3 +222,4 @@ function sendMessage(message, name, destinationDomain, cb) {
 		console.log('Response: ', error, response.body, response.statusCode);
 	});
 }
+*/

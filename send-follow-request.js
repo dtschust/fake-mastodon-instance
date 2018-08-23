@@ -3,14 +3,13 @@ const request = require('request');
 const crypto = require('crypto');
 
 const message = require('./follow-request.json');
-message.id += Date.now();
 // Reply
 // const message = require('./reply.json');
-// message.id += Date.now();
 // message.object.id += Date.now();
 // message.object.content = `<p> Test Reply ${Date.now()} </p>`;
 // message.object.published = new Date().toISOString();
 
+message.id += Date.now();
 
 const domain = 'https://fake-mastodon-instance.herokuapp.com'
 const privkey = process.env.INSTANCE_PRIVATE_KEY;

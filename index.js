@@ -1,10 +1,10 @@
 // TODO: prettier
 require('dotenv').config();
+const request = require('request');
+const crypto = require('crypto');
 const express = require('express');
 const bodyParser = require('body-parser');
 const Twit = require('twit');
-const https = require('https');
-const httpSignature = require('http-signature');
 
 const T = new Twit({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -23,45 +23,9 @@ const domain = process.env.DOMAIN;
 const key = process.env.INSTANCE_PUBLIC_KEY;
 const cert = process.env.INSTANCE_PRIVATE_KEY;
 
-// TODO: Here's how to make a signed request I think
-/*
-var options = {
-	host: 'localhost',
-	port: 8443,
-	path: '/',
-	method: 'GET',
-	headers: {}
-};
-
-// Adds a 'Date' header in, signs it, and adds the
-// 'Authorization' header in.
-var req = https.request(options, function (res) {
-	console.log(res.statusCode);
-});
-
-
-httpSignature.sign(req, {
-	key: key,
-	keyId: './cert.pem'
-});
-
-req.end();
-*/
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.json({ type: ['application/json', 'application/activity+json', 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"'] }))
-
-// app.get('/.well-known/host-meta', (req, res) => {
-// 	const xml = `<?xml version='1.0' encoding='UTF-8'?>
-// <XRD xmlns='http://docs.oasis-open.org/ns/xri/xrd-1.0'>
-//   <Link rel='lrdd' type='application/json'
-//         template='https://bridgy-federated.appspot.com/.well-known/webfinger?resource={uri}' />
-// </XRD>`;
-// 	res.status(202);
-// 	res.type('application/xml');
-// 	res.send(xml);
-// });
 
 app.post('/inbox', (req, res) => {
 	console.log('got an inbox post!', req.body);
@@ -103,39 +67,34 @@ signatureValue: 'Wh0v2QugV7OJV1ON4pKBD4yEtlMy6QSyx6ZBR9jesMz7sjbjsRznDlhnKcHe4/U
 	}
 
 	console.log('HEADERS:', req.headers);
-	// 'keyId="https://xoxo.zone/users/nuncamind#main-key",algorithm="rsa-sha256",headers="(request-target) user-agent host date accept-encoding digest content-type",signature="oTwNkVRCQhTC5aASK86qd8uZbKug1qr4SaMfPdWNQzX5cxD4gan+K49GyZXb2FLUQvf2KaxXCujsO3yIDlGnD3A87JgRJVsmvNFZU7ftchngaYEHGDS7402WHRXBReSZjwThCB2O2vaZT6wN5ojDSgVAS8NvjZWDmZNe8RPaDib0MuQC+6KSuOSfw6e7Rq/8caDAfarQ6p4JG1uj/05DtbguPKa6hmtVK2IrdJcXgbcJQ4ScIIhwwkAIKD0Sxw1hXceWVj6b82pvLEKjQr3ix7B6gwCSuaUwk7cuganzLFllDjoDHiQdmjlTd3gqOgppmtg2VTu0mg851cim9NsVDg=="'
-
-	// const signatureHeader = req.headers.Signature.split(',');
-	// const keyId = signatureHeader[0].split('=')[1].slice(1, -1);
-	// const headers = signatureHeader[2].split('=')[1].slice(1, -1);
-	// const signature = atob(signatureHeader[3].split('=')[1].slice(1, -1));
-	// req.headers.signature = req.headers.authorization;
-	// req.headers.signature = req.headers.signature.slice('Signature: '.length);
-	// console.log('req.headers.signature', req.headers.signature);
-	// var parsed = httpSignature.parseRequest(req);
-	// // var pub = req.body.signatureValue;
-	// if (!httpSignature.verifySignature(parsed, pub)) {
-	// 	console.log('Invalid http signature I think!');
-	// 	res.status(500).end();
-	// 	return;
-	// }
-
+	// TODO: validate signature I guess
 	if (req.body.type === 'Follow') {
 		let userToAdd = req.body.object.split('/')
 		userToAdd = userToAdd[userToAdd.length - 1];
 		console.log('wants to follow', userToAdd);
-		// TODO: send "Accept" type event. Find out how it's formatted by trying to follow and unfollow
+		const id = Date.now();
+		const message = {
+			'@context': 'https://www.w3.org/ns/activitystreams',
+			id: `${domain}/users/${userToAdd}#accepts/follows/${id}`,
+			type: 'Accept',
+			actor: req.body.object,
+			object:
+			{
+				id: req.body.id,
+				type: req.body.type,
+				actor: req.body.actor,
+				object: req.body.object,
+			},
+		}
+		sendMessage(message, userToAdd, 'mastodon.social', (error, response, body) => { // TODO dynamic domain
+			res.status(202).end();
+		})
+
 		// TODO: Add this user to the list of followers, update the database.
 		// TODO: Maybe manually trigger a crawl of this user instead of waiting for the crawler
-	} else if (req.body.type === 'Unfollow') {
-		let userToRemove = req.body.object.split('/')
-		userToRemove = userToRemove[userToAdd.length - 1];
-		console.log('wants to unfollow', userToRemove);
-		// TODO: send "Accept" type event. Find out how it's formatted by trying to follow and unfollow
-		// TODO: Remove this user from the list of followers, update the database.
 
+		// TODO: support unfollows
 	}
-	res.status(202).end();
 });
 
 app.get('/users/:username', (req,res) => {
@@ -231,3 +190,33 @@ app.get('*', (req, res) => {
 });
 
 app.listen(process.env.PORT || 3000);
+
+function sendMessage(message, name, destinationDomain, cb) {
+	const signer = crypto.createSign('sha256');
+	let d = new Date();
+	let stringToSign = `(request-target): post /inbox\nhost: ${destinationDomain}\ndate: ${d.toUTCString()}`; // TODO hardcoded host
+	signer.update(stringToSign);
+	signer.end;
+	const signature = signer.sign(cert);
+	const signature_b64 = signature.toString('base64')
+	let header = `keyId="${domain}/users/${username}",headers="(request-target) host date",signature="${signature_b64}"`;
+
+	console.log('signature:', header);
+	console.log('Sending message', message);
+	request({
+		url: `https://${destinationDomain}/inbox`,
+		headers: {
+			'Host': destinationDomain,
+			'Date': d.toUTCString(),
+			'Signature': header
+		},
+		method: 'POST',
+		json: true,
+		body: message
+	}, function (error, response, body) {
+		if (cb) {
+			cb(error, response, body);
+		}
+		console.log('Response: ', error, response.body, response.statusCode);
+	});
+}

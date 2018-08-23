@@ -3,11 +3,6 @@ const request = require('request');
 const crypto = require('crypto');
 
 const message = require('./follow-request.json');
-// Reply
-// const message = require('./reply.json');
-// message.object.id += Date.now();
-// message.object.content = `<p> Test Reply ${Date.now()} </p>`;
-// message.object.published = new Date().toISOString();
 
 message.id += Date.now();
 

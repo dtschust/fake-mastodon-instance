@@ -58,7 +58,7 @@ app.use(express.json({ type: ['application/json', 'application/activity+json', '
 //   <Link rel='lrdd' type='application/json'
 //         template='https://bridgy-federated.appspot.com/.well-known/webfinger?resource={uri}' />
 // </XRD>`;
-// 	res.status(200);
+// 	res.status(202);
 // 	res.type('application/xml');
 // 	res.send(xml);
 // });
@@ -98,7 +98,7 @@ signatureValue: 'Wh0v2QugV7OJV1ON4pKBD4yEtlMy6QSyx6ZBR9jesMz7sjbjsRznDlhnKcHe4/U
 
 	// Ignore anything that doesn't come from my account, hardcoded for now
 	if (req.body.actor !== 'https://mastodon.social/users/nuncatest') {
-		res.status(200).end();
+		res.status(202).end();
 		return;
 	}
 
@@ -135,7 +135,7 @@ signatureValue: 'Wh0v2QugV7OJV1ON4pKBD4yEtlMy6QSyx6ZBR9jesMz7sjbjsRznDlhnKcHe4/U
 		// TODO: Remove this user from the list of followers, update the database.
 
 	}
-	res.status(200).end();
+	res.status(202).end();
 });
 
 app.get('/users/:username', (req,res) => {
@@ -227,7 +227,7 @@ app.get('/.well-known/webfinger', (req, res) => {
 });
 app.get('*', (req, res) => {
 	console.log('got a request!', req.path, req.query, req.body);
-	res.status(200).end();
+	res.status(202).end();
 });
 
 app.listen(process.env.PORT || 3000);

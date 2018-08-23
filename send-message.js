@@ -3,6 +3,7 @@ const request = require('request');
 const crypto = require('crypto');
 
 const domain = process.env.DOMAIN;
+const cert = process.env.INSTANCE_PRIVATE_KEY;
 
 module.exports = function sendMessage(message, name, destinationDomain, cb) {
 	const signer = crypto.createSign('sha256');

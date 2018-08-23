@@ -4,7 +4,7 @@ const crypto = require('crypto');
 
 const domain = process.env.DOMAIN;
 
-function sendMessage(message, name, destinationDomain, cb) {
+module.exports = function sendMessage(message, name, destinationDomain, cb) {
 	const signer = crypto.createSign('sha256');
 	let d = new Date();
 	let stringToSign = `(request-target): post /inbox\nhost: ${destinationDomain}\ndate: ${d.toUTCString()}`; // TODO hardcoded host

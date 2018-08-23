@@ -199,7 +199,7 @@ function sendMessage(message, name, destinationDomain, cb) {
 	signer.end;
 	const signature = signer.sign(cert);
 	const signature_b64 = signature.toString('base64')
-	let header = `keyId="${domain}/users/${username}",headers="(request-target) host date",signature="${signature_b64}"`;
+	let header = `keyId="${domain}/users/${name}",headers="(request-target) host date",signature="${signature_b64}"`;
 
 	console.log('signature:', header);
 	console.log('Sending message', message);

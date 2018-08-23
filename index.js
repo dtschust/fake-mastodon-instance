@@ -165,7 +165,12 @@ app.get('/users/:username', (req,res) => {
 					"url": `${data.profile_image_url.replace('_normal', '_400x400')}`,
 					"type": "Image"
 				}
-			]
+			],
+			"publicKey": {
+				"id": `${domain}/users/${username}#main-key`,
+				"owner": `${domain}/users/${username}`,
+				"publicKeyPem": process.env.INSTANCE_PUBLIC_KEY,
+			},
 		});
 	}).catch((e) => {
 		console.log('Error', e);

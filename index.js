@@ -98,7 +98,7 @@ signatureValue: 'Wh0v2QugV7OJV1ON4pKBD4yEtlMy6QSyx6ZBR9jesMz7sjbjsRznDlhnKcHe4/U
 
 	// Ignore anything that doesn't come from my account, hardcoded for now
 	if (req.body.actor !== 'https://mastodon.social/users/nuncatest') {
-		res.status(500).end();
+		res.status(200).end();
 		return;
 	}
 

@@ -135,7 +135,7 @@ signatureValue: 'Wh0v2QugV7OJV1ON4pKBD4yEtlMy6QSyx6ZBR9jesMz7sjbjsRznDlhnKcHe4/U
 		// TODO: Remove this user from the list of followers, update the database.
 
 	}
-	res.status(500).end();
+	res.status(200).end();
 });
 
 app.get('/users/:username', (req,res) => {

@@ -13,9 +13,10 @@ message.id += Date.now();
 
 const domain = 'https://fake-mastodon-instance.herokuapp.com'
 const privkey = process.env.INSTANCE_PRIVATE_KEY;
-const username = 'nuncamind';
+const username = 'dril';
 const theirDomain = 'mastodon.social';
 
+console.log(privkey);
 console.log(message);
 
 const signer = crypto.createSign('sha256');

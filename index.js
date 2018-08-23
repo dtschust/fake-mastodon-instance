@@ -212,10 +212,10 @@ app.get('/.well-known/webfinger', (req, res) => {
 				// 	"rel": "salmon",
 				// 	"href": `${domain}/api/salmon/37322` // TODO get an id?
 				// },
-				{
-					"rel": "magic-public-key", // TODO get a real public key
-					"href": "data:application/magic-public-key,RSA.ouYy9P4LLbEzzCNCtevEIcFbobS3USLNIRSUawGe2wuWLI8CPuRfN5Fz4ZTPfWytqwFDbF5ff4zkteizolNKJEMmMT1TD1K8SZk1lp0hvpuDK-vp8XioxVXHkyaN4JxbMRQqG62kozvB5LQvFvomMQRgQTSSjvYb7VMWbF5m6y0=.AQAB",
-				},
+				// {
+				// 	"rel": "magic-public-key", // TODO get a real public key
+				// 	"href": "data:application/magic-public-key,RSA.ouYy9P4LLbEzzCNCtevEIcFbobS3USLNIRSUawGe2wuWLI8CPuRfN5Fz4ZTPfWytqwFDbF5ff4zkteizolNKJEMmMT1TD1K8SZk1lp0hvpuDK-vp8XioxVXHkyaN4JxbMRQqG62kozvB5LQvFvomMQRgQTSSjvYb7VMWbF5m6y0=.AQAB",
+				// },
 				// {
 				// 	"rel": "http://ostatus.org/schema/1.0/subscribe",
 				// 	"template": `${domain}/authorize_follow?acct={uri}`

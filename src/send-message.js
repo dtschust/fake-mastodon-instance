@@ -12,25 +12,28 @@ module.exports = function sendMessage(message, name, destinationDomain, cb) {
 	signer.update(stringToSign);
 	signer.end;
 	const signature = signer.sign(cert);
-	const signature_b64 = signature.toString('base64')
+	const signature_b64 = signature.toString('base64');
 	let header = `keyId="${domain}/users/${name}",headers="(request-target) host date",signature="${signature_b64}"`;
 
 	console.log('signature:', header);
 	console.log('Sending message', message);
-	request({
-		url: `https://${destinationDomain}/inbox`,
-		headers: {
-			'Host': destinationDomain,
-			'Date': d.toUTCString(),
-			'Signature': header
+	request(
+		{
+			url: `https://${destinationDomain}/inbox`,
+			headers: {
+				Host: destinationDomain,
+				Date: d.toUTCString(),
+				Signature: header,
+			},
+			method: 'POST',
+			json: true,
+			body: message,
 		},
-		method: 'POST',
-		json: true,
-		body: message
-	}, function (error, response, body) {
-		if (cb) {
-			cb(error, response, body);
-		}
-		console.log('Response: ', error, response.body, response.statusCode);
-	});
-}
+		function(error, response, body) {
+			if (cb) {
+				cb(error, response, body);
+			}
+			console.log('Response: ', error, response.body, response.statusCode);
+		},
+	);
+};

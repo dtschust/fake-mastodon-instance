@@ -1,4 +1,4 @@
-const sendMessage = require('../send-message');
+const sendMessage = require('../src/send-message');
 
 const user = 'pepsi';
 const now = Date.now();

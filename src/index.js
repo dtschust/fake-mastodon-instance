@@ -86,7 +86,7 @@ app.post('/inbox', (req, res) => {
 app.get('/status/:user/:id', (req, res) => {
 	res.redirect(
 		301,
-		`https://twitter.com/${req.paraams.user}/status/${req.params.id}`,
+		`https://twitter.com/${req.params.user}/status/${req.params.id}`,
 	);
 });
 

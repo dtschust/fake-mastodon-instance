@@ -15,8 +15,8 @@ module.exports = function sendMessage(message, name, destinationDomain, cb) {
 	const signature_b64 = signature.toString('base64');
 	let header = `keyId="${domain}/users/${name}",headers="(request-target) host date",signature="${signature_b64}"`;
 
-	console.log('signature:', header);
-	console.log('Sending message', message);
+	// console.log('signature:', header);
+	// console.log('Sending message', message);
 	return new Promise((resolve, reject) => {
 		request(
 			{
@@ -31,7 +31,7 @@ module.exports = function sendMessage(message, name, destinationDomain, cb) {
 				body: message,
 			},
 			function(error, response, body) {
-				console.log('Response: ', error, response.body, response.statusCode);
+				// console.log('Response: ', error, response.body, response.statusCode);
 				if (error) {
 					reject(error);
 				} else {

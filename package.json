@@ -1,19 +1,21 @@
 {
-  "name": "fake-mastodon-instance",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "body-parser": "^1.18.3",
-    "dotenv": "^4.0.0",
-    "express": "^4.16.3",
-    "mongoose": "^4.11.12",
-    "twit": "^2.2.11"
-  }
+	"name": "fake-mastodon-instance",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"prettier": "prettier --write src/**/*.js*",
+		"start": "node index.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"body-parser": "^1.18.3",
+		"dotenv": "^4.0.0",
+		"express": "^4.16.3",
+		"mongoose": "^4.11.12",
+		"prettier": "^1.14.2",
+		"twit": "^2.2.11"
+	}
 }

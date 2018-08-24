@@ -41,7 +41,7 @@ function addNewFollowerToList(username) {
 		username,
 	});
 	// store the new user to follow!
-	newFollowerUsernames.save(saveErr => {
+	newFollowingUsername.save(saveErr => {
 		if (saveErr) {
 			console.log('Error saving to database', saveErr);
 		}

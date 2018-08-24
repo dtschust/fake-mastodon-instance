@@ -17,23 +17,30 @@ module.exports = function sendMessage(message, name, destinationDomain, cb) {
 
 	console.log('signature:', header);
 	console.log('Sending message', message);
-	request(
-		{
-			url: `https://${destinationDomain}/inbox`,
-			headers: {
-				Host: destinationDomain,
-				Date: d.toUTCString(),
-				Signature: header,
+	return new Promise((resolve, reject) => {
+		request(
+			{
+				url: `https://${destinationDomain}/inbox`,
+				headers: {
+					Host: destinationDomain,
+					Date: d.toUTCString(),
+					Signature: header,
+				},
+				method: 'POST',
+				json: true,
+				body: message,
 			},
-			method: 'POST',
-			json: true,
-			body: message,
-		},
-		function(error, response, body) {
-			if (cb) {
-				cb(error, response, body);
-			}
-			console.log('Response: ', error, response.body, response.statusCode);
-		},
-	);
+			function(error, response, body) {
+				console.log('Response: ', error, response.body, response.statusCode);
+				if (error) {
+					reject(error);
+				} else {
+					resolve(body);
+				}
+				if (cb) {
+					cb(error, response, body);
+				}
+			},
+		);
+	});
 };

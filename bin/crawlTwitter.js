@@ -52,7 +52,7 @@ Promise.all([
 	}
 
 	const userPromises = [];
-	followerUsernames.concat('big_ben_clock').forEach(followerUsername => {
+	followerUsernames.forEach(followerUsername => {
 		const tweetsForUserPromises = [];
 		userPromises.push(
 			T.get('statuses/user_timeline', {
@@ -60,58 +60,62 @@ Promise.all([
 				count: 100,
 				exclude_replies: true,
 				include_rts: false,
-			}).then(result => {
-				result.data.forEach(tweet => {
-					if (seenTweetIds[tweet.id]) {
-						// Already posted this tweet, move along!
-						return;
-					}
-					tweetsForUserPromises.push(
-						postTweet(tweet).then(() => {
-							// console.log('post tweet complete!');
-							seenTweetIdsToUpdate.push(tweet.id);
-						}),
-					);
-				});
-				return Promise.all(tweetsForUserPromises);
-			}),
+			})
+				.then(result => {
+					result.data.forEach(tweet => {
+						if (seenTweetIds[tweet.id]) {
+							// Already posted this tweet, move along!
+							return;
+						}
+						tweetsForUserPromises.push(
+							postTweet(tweet).then(() => {
+								// console.log('post tweet complete!');
+								seenTweetIdsToUpdate.push(tweet.id);
+							}),
+						);
+					});
+					return Promise.all(tweetsForUserPromises);
+				})
+				.catch(e => {
+					console.log('ERROR!', followerUsername);
+				}),
 		);
-		Promise.all(userPromises).then(() => {
-			if (!seenTweetIdsToUpdate.length) {
-				console.log('no updates!');
-				process.exit(0);
-			}
+	});
+	Promise.all(userPromises).then(() => {
+		if (!seenTweetIdsToUpdate.length) {
+			console.log('no updates!');
+			process.exit(0);
+		}
 
-			SeenTweetIdsModel.findOne(undefined)
-				.exec()
-				.then(seenTweetIdsContainer => {
-					let seenTweetIds;
-					if (!seenTweetIdsContainer) {
-						seenTweetIds = {};
-					} else {
-						seenTweetIds = seenTweetIdsContainer.seenTweetIds;
-					}
-					seenTweetIdsToUpdate.forEach(tweetId => {
-						seenTweetIds[tweetId] = true;
+		SeenTweetIdsModel.findOne(undefined)
+			.exec()
+			.then(seenTweetIdsContainer => {
+				let seenTweetIds;
+				if (!seenTweetIdsContainer) {
+					seenTweetIds = {};
+				} else {
+					seenTweetIds = seenTweetIdsContainer.seenTweetIds;
+				}
+				seenTweetIdsToUpdate.forEach(tweetId => {
+					seenTweetIds[tweetId] = true;
+				});
+				// remove old map, we've got a new one to store!
+				SeenTweetIdsModel.remove(undefined, err => {
+					const newSeenTweetIdsModel = new SeenTweetIdsModel({
+						seenTweetIds,
 					});
-					// remove old map, we've got a new one to store!
-					SeenTweetIdsModel.remove(undefined, err => {
-						const newSeenTweetIdsModel = new SeenTweetIdsModel({
-							seenTweetIds,
-						});
-						// store the new map!
-						newSeenTweetIdsModel.save(saveErr => {
-							if (saveErr) {
-								console.log('Error saving to database', saveErr);
-							}
-							console.log(
-								`done! Saved ${seenTweetIdsToUpdate.length} new tweets!`,
-							);
-							process.exit(0);
-						});
+					// store the new map!
+					newSeenTweetIdsModel.save(saveErr => {
+						if (saveErr) {
+							console.log('Error saving to database', saveErr);
+						}
+						console.log(
+							`done! Saved ${seenTweetIdsToUpdate.length} new tweets!`,
+						);
+						process.exit(0);
 					});
 				});
-		});
+			});
 	});
 });
 
@@ -137,8 +141,5 @@ function postTweet(tweet) {
 		},
 	};
 
-	return sendMessage(message, user, 'mastodon.social').then(body => {
-		// console.log('message sent to mastodon!');
-		// TODO hardcoded destination domain
-	});
+	return sendMessage(message, user, 'mastodon.social');
 }

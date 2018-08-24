@@ -13,10 +13,10 @@ var T = new Twit({
 //
 //  tweet 'hello world!'
 //
-T.get(
-	'statuses/user_timeline',
-	{ screen_name: 'realdonaldtrump', count: 1 },
-	function(err, data, response) {
-		console.log(data);
-	},
-);
+T.get('statuses/user_timeline', { screen_name: 'zdfs', count: 1 }, function(
+	err,
+	data,
+	response,
+) {
+	console.log(data);
+});

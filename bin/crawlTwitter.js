@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 require('dotenv').config();
+
+const DEBUG = !!process.env.debug;
 const twitter = require('twitter-text');
 const mongoose = require('mongoose');
 const Twit = require('twit');
@@ -110,6 +112,9 @@ Promise.all([
 			process.exit(0);
 		}
 
+		if (DEBUG) {
+			process.exit(0);
+		}
 		SeenTweetIdsModel.findOne(undefined)
 			.exec()
 			.then(seenTweetIdsContainer => {
@@ -179,6 +184,9 @@ function postTweet(tweet) {
 		},
 	};
 
+	if (DEBUG) {
+		return Promise.resolve();
+	}
 	return sendMessage(message, user, 'mastodon.social');
 }
 

@@ -119,9 +119,14 @@ Promise.all([
 				} else {
 					seenTweetIds = seenTweetIdsContainer.seenTweetIds;
 				}
+
+				// TODO: go through all of seenTweetIds and
+				// cull out anything where the ts is older than 12 hours
+
 				seenTweetIdsToUpdate.forEach(tweetId => {
-					seenTweetIds[tweetId] = true;
+					seenTweetIds[tweetId] = now;
 				});
+
 				// remove old map, we've got a new one to store!
 				SeenTweetIdsModel.remove(undefined, err => {
 					const newSeenTweetIdsModel = new SeenTweetIdsModel({

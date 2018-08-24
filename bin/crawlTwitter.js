@@ -26,21 +26,28 @@ const FollowerIdsModel = mongoose.model('FollowerIdsModel', {
 	followerIds: [String],
 });
 
-const SeenTweetIds = mongoose.model('SeenTweetIds', {
+const SeenTweetIdsModel = mongoose.model('SeenTweetIdsModel', {
 	seenTweetIds: Object,
 });
 
 Promise.all([
 	FollowerIdsModel.findOne(undefined).exec(),
-	SeenTweetIds.findOne(undefined).exec(),
-]).then(([followerIds, seenTweetIds]) => {
+	SeenTweetIdsModel.findOne(undefined).exec(),
+]).then(([followerIdsContainer, seenTweetIdsContainer]) => {
 	const seenTweetIdsToUpdate = [];
-	if (!followerIds) {
+	let followerIds;
+	let seenTweetIds;
+	if (!followerIdsContainer) {
 		followerIds = [];
+	} else {
+		followerIds = followerIdsContainer.followerIds;
 	}
-	if (!seenTweetIds) {
+	if (!seenTweetIdsContainer) {
 		seenTweetIds = {};
+	} else {
+		seenTweetIds = seenTweetIdsContainer.seenTweetIds;
 	}
+
 	const userPromises = [];
 	followerIds.concat('792518').forEach(followerId => {
 		const tweetsForUserPromises = [];
@@ -63,9 +70,41 @@ Promise.all([
 						});
 					}),
 				);
-				process.exit(0);
+				return Promise.all(tweetsForUserPromises);
 			}),
 		);
+		Promise.all(userPromises).then(() => {
+			if (!seenTweetIdsToUpdate.length) {
+				console.log('no updates!');
+				process.exit(0);
+			}
+			SeenTweetIdsModel.findOne(undefined)
+				.exec()
+				.then(seenTweetIds => {
+					if (!seenTweetIds) {
+						seenTweetIds = {};
+					}
+					seenTweetIdsToUpdate.forEach(tweetId => {
+						seenTweetIds[tweetId] = true;
+					});
+					// remove old map, we've got a new one to store!
+					SeenTweetIdsModel.remove(undefined, err => {
+						const newSeenTweetIdsModel = new SeenTweetIdsModel({
+							seenTweetIds,
+						});
+						// store the new map!
+						newSeenTweetIdsModel.save(saveErr => {
+							if (saveErr) {
+								console.log('Error saving to database', saveErr);
+							}
+							console.log(
+								`done! Saved ${seenTweetIdsToUpdate.length} new tweets!`,
+							);
+							process.exit(0);
+						});
+					});
+				});
+		});
 	});
 });
 
@@ -73,135 +112,3 @@ Promise.all([
 function postTweet(tweet) {
 	return Promise.resolve();
 }
-/*
-let storedEpisodesModel;
-FemFreqEpisodesModel.findOne(undefined)
-	.exec()
-	.then(newStoredEpisodesModel => {
-		storedEpisodesModel = newStoredEpisodesModel || { episodes: {}, order: [] };
-		fetchNewEpisodes();
-	})
-	.catch(e => {
-		console.log('Huh, we have an error', e);
-		process.exit(0);
-	});
-
-async function fetchNewEpisodes() {
-	const browser = await puppeteer.launch({
-		headless: true,
-		args: ['--no-sandbox', '--disable-setuid-sandbox'],
-	});
-	const page = await browser.newPage();
-	await page.goto('https://d.rip/login');
-
-	await page.waitForSelector('#user_session_email');
-	const usernameInput = await page.$('#user_session_email');
-	const passwordInput = await page.$('#user_session_password');
-	await page.click('#user_session_email');
-	await page.keyboard.type(process.env.KICKSTARTER_LOGIN);
-
-	await page.click('#user_session_password');
-	await page.keyboard.type(process.env.KICKSTARTER_PASSWORD);
-
-	await page.click('input[value="Log in with Kickstarter"]');
-
-	await page.waitForNavigation();
-
-	await page.goto('https://d.rip/femfreq');
-
-	await page.waitForSelector('audio');
-
-	const episodeContainers = await page.$$('.grid-row');
-	const titlesHandles = await page.$$('h1 a');
-	const descriptionsHandles = await page.$$('div.rich-text p');
-	const audioEmbeds = await page.$$('audio');
-
-	const urls = await Promise.all(
-		audioEmbeds.map(async audioEmbed => {
-			const src = await page.evaluate(audioEmbed => audioEmbed.src, audioEmbed);
-			return src;
-		}),
-	);
-
-	const titles = await Promise.all(
-		titlesHandles.map(async titleHandle => {
-			const src = await page.evaluate(
-				titleHandle => titleHandle.innerText,
-				titleHandle,
-			);
-			return src;
-		}),
-	);
-
-	const descriptions = await Promise.all(
-		descriptionsHandles.map(async descriptionHandle => {
-			const src = await page.evaluate(
-				descriptionHandle => descriptionHandle.innerText,
-				descriptionHandle,
-			);
-			return src;
-		}),
-	);
-
-	const episodes = urls
-		.map((url, i) => ({
-			url,
-			title: titles[i],
-			description: descriptions[i],
-			pubDate: pubDate(new Date(Date.now() - i * 1000)),
-		}))
-		.reverse();
-
-	let newEpisodesFound = false;
-	episodes.forEach(episode => {
-		const urlKey = episode.url.replace(/\./g, ''); // can't store periods in keys for mongodb
-		if (!storedEpisodesModel.episodes[urlKey]) {
-			storedEpisodesModel.episodes[urlKey] = episode;
-			storedEpisodesModel.order.push(urlKey);
-			newEpisodesFound = true;
-		}
-	});
-
-	if (newEpisodesFound) {
-		// remove old map, we've got a new one to store!
-		FemFreqEpisodesModel.remove(undefined, err => {
-			const newStoredEpisodesModel = new FemFreqEpisodesModel(
-				storedEpisodesModel,
-			);
-			// store the new savedToots map!
-			newStoredEpisodesModel.save(saveErr => {
-				if (saveErr) {
-					console.log('Error saving to database', saveErr);
-				}
-				console.log(`done! Saved new episodes!`);
-				browser.close().then(() => {
-					process.exit(0);
-				});
-			});
-		});
-	} else {
-		await browser.close();
-		process.exit(0);
-	}
-}
-
-function pubDate(date) {
-	if (typeof date === 'undefined') {
-		date = new Date();
-	}
-
-	var pieces = date.toString().split(' '),
-		offsetTime = pieces[5].match(/[-+]\d{4}/),
-		offset = offsetTime ? offsetTime : pieces[5],
-		parts = [
-			pieces[0] + ',',
-			pieces[2],
-			pieces[1],
-			pieces[3],
-			pieces[4],
-			offset,
-		];
-
-	return parts.join(' ');
-}
-*/

@@ -24,8 +24,8 @@ mongoose.connect(
 	},
 );
 
-const FollowerIdsModel = mongoose.model('FollowerIdsModel', {
-	followerIds: [String],
+const FollowerUsernamesModel = mongoose.model('FollowerUsernamesModel', {
+	followerUsernames: [String],
 });
 
 const SeenTweetIdsModel = mongoose.model('SeenTweetIdsModel', {
@@ -33,16 +33,16 @@ const SeenTweetIdsModel = mongoose.model('SeenTweetIdsModel', {
 });
 
 Promise.all([
-	FollowerIdsModel.findOne(undefined).exec(),
+	FollowerUsernamesModel.findOne(undefined).exec(),
 	SeenTweetIdsModel.findOne(undefined).exec(),
-]).then(([followerIdsContainer, seenTweetIdsContainer]) => {
+]).then(([followerUsernamesContainer, seenTweetIdsContainer]) => {
 	const seenTweetIdsToUpdate = [];
-	let followerIds;
+	let followerUsernames;
 	let seenTweetIds;
-	if (!followerIdsContainer) {
-		followerIds = [];
+	if (!followerUsernamesContainer) {
+		followerUsernames = [];
 	} else {
-		followerIds = followerIdsContainer.followerIds;
+		followerUsernames = followerUsernamesContainer.followerUsernames;
 	}
 	if (!seenTweetIdsContainer) {
 		seenTweetIds = {};
@@ -51,12 +51,12 @@ Promise.all([
 	}
 
 	const userPromises = [];
-	followerIds.concat('86391789').forEach(followerId => {
+	followerUsernames.concat('big_ben_clock').forEach(followerUsername => {
 		const tweetsForUserPromises = [];
 		userPromises.push(
 			T.get('statuses/user_timeline', {
-				user_id: followerId,
-				count: 1,
+				screen_name: followerUsername,
+				count: 3,
 				exclude_replies: true,
 				include_rts: false,
 			}).then(result => {
@@ -80,11 +80,15 @@ Promise.all([
 				console.log('no updates!');
 				process.exit(0);
 			}
+
 			SeenTweetIdsModel.findOne(undefined)
 				.exec()
-				.then(seenTweetIds => {
-					if (!seenTweetIds) {
+				.then(seenTweetIdsContainer => {
+					let seenTweetIds;
+					if (!seenTweetIdsContainer) {
 						seenTweetIds = {};
+					} else {
+						seenTweetIds = seenTweetIdsContainer.seenTweetIds;
 					}
 					seenTweetIdsToUpdate.forEach(tweetId => {
 						seenTweetIds[tweetId] = true;
@@ -112,11 +116,11 @@ Promise.all([
 
 function postTweet(tweet) {
 	const user = tweet.user.screen_name;
-	const id = tweet.id;
+	const id = tweet.id_str;
 	const message = {
 		'@context': 'https://www.w3.org/ns/activitystreams',
 
-		id: `${domain}/status-updates/${user}/status/${id}${Date.now()}`,
+		id: `${domain}/status-updates/${user}/status/${id}`,
 		type: 'Create',
 		actor: `${domain}/users/${user}`,
 		to: 'https://www.w3.org/ns/activitystreams#Public', // TODO figure out how to make these not public

@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const Twit = require('twit');
 const sendMessage = require('./send-message');
+const mongoose = require('mongoose');
 
 const T = new Twit({
 	consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -12,6 +13,50 @@ const T = new Twit({
 	timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
 	strictSSL: true, // optional - requires SSL certificates to be valid.
 });
+
+mongoose.Promise = global.Promise;
+mongoose.connect(
+	process.env.MONGO_DB_URI,
+	{
+		useMongoClient: true,
+	},
+);
+
+const FollowerUsernamesModel = mongoose.model('FollowerUsernamesModel', {
+	followerUsernames: [String],
+});
+
+function addNewFollowerToList(userToAdd) {
+	FollowerUsernamesModel.findOne(undefined)
+		.exec()
+		.then(followerUsernamesContainer => {
+			let followerUsernames;
+			if (!followerUsernamesContainer) {
+				followerUsernames = [];
+			} else {
+				followerUsernames = followerUsernamesContainer.followerUsernames;
+			}
+			if (followerUsernames.indexOf(userToAdd) !== -1) {
+				console.log(`Already following ${userToAdd}!`);
+				return;
+			}
+
+			followerUsernames.push(userToAdd);
+			// remove old map, we've got a new one to store!
+			FollowerUsernamesModel.remove(undefined, err => {
+				const newFollowerUsernames = new FollowerUsernamesModel({
+					followerUsernames,
+				});
+				// store the new map!
+				newFollowerUsernames.save(saveErr => {
+					if (saveErr) {
+						console.log('Error saving to database', saveErr);
+					}
+					console.log(`done! Now following ${userToAdd}!`);
+				});
+			});
+		});
+}
 
 const app = express();
 
@@ -75,6 +120,7 @@ app.post('/inbox', (req, res) => {
 		);
 
 		// TODO: Add this user to the list of followers, update the database.
+		addNewFollowerToList(userToAdd);
 		// TODO: Maybe manually trigger a crawl of this user instead of waiting for the crawler
 
 		// TODO: support unfollows

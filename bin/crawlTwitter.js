@@ -190,12 +190,27 @@ function postTweet(tweet) {
 	return sendMessage(message, user, 'mastodon.social');
 }
 
-function fetchFollowers() {
-	// TODO check process.env.DEBUG instead once the real implementation lands
-	if (mockFollowersArray) {
+function fetchFollowers(prevFollowerIds = [], next_cursor) {
+	if (DEBUG) {
 		return Promise.resolve(mockFollowersArray);
 	}
 
 	// TODO actually fetch the followers, perhaps persisting in a database also
 	// The code is in tweet-test.js, just port it over dude!
+	return T.get('friends/list', {
+		screen_name: 'nuncamind',
+		count: 200,
+		include_user_entities: false,
+		cursor: next_cursor,
+	}).then(response => {
+		const followerIds = prevFollowerIds.concat(
+			response.data.users.map(({ id }) => id),
+		);
+		if (response.data.next_cursor) {
+			return fetchFollowers(followerIds, response.data.next_cursor);
+		}
+
+		console.log(`nuncamind has ${followerIds.length} followers`);
+		return followerIds;
+	});
 }

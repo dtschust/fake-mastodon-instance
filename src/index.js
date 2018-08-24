@@ -136,6 +136,10 @@ app.get('/status/:user/:id', (req, res) => {
 	);
 });
 
+app.get('/@:user', (req, res) => {
+	res.redirect(301, `https://twitter.com/${req.params.user}`);
+});
+
 app.get('/users/:username', (req, res) => {
 	// TODO: cache these profiles.
 	// TODO: figure out how to invalidate caches for profiles as well, the other instances have their own caches

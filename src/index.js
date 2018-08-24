@@ -37,9 +37,6 @@ const FollowingUsernameModel = mongoose.model('FollowingUsername', {
 });
 
 function addNewFollowerToList(username) {
-	const newFollowingUsername = new FollowingUsernameModel({
-		username,
-	});
 	// store the new user to follow, if we aren't already storing them!
 	FollowingUsernameModel.findOne({ username }, (err, response) => {
 		if (err) {
@@ -50,6 +47,10 @@ function addNewFollowerToList(username) {
 			// Nothing to do, we're already following this person.
 			return;
 		}
+
+		const newFollowingUsername = new FollowingUsernameModel({
+			username,
+		});
 
 		newFollowingUsername.save(saveErr => {
 			if (saveErr) {

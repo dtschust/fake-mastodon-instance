@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-const DEBUG = !!process.env.debug;
+const DEBUG = !!process.env.DEBUG;
 const twitter = require('twitter-text');
 const mongoose = require('mongoose');
 const Twit = require('twit');
@@ -35,15 +35,12 @@ const FollowingUsernameModel = mongoose.model('FollowingUsername', {
 
 const SeenTweetIdModel = mongoose.model('SeenTweetIdModel', {
 	timestamp: Number,
-});
-
-const SeenTweetIdsModel = mongoose.model('SeenTweetIdsModel', {
-	seenTweetIds: Object,
+	id: Number,
 });
 
 Promise.all([
 	FollowingUsernameModel.find(undefined).exec(),
-	SeenTweetIdsModel.findOne(undefined).exec(),
+	SeenTweetIdModel.find(undefined).exec(),
 	fetchFollowers(),
 ]).then(([followingUsernameContainer, seenTweetIdsContainer, followerIds]) => {
 	const seenTweetIdsToUpdate = [];
@@ -59,7 +56,10 @@ Promise.all([
 	if (!seenTweetIdsContainer) {
 		seenTweetIds = {};
 	} else {
-		seenTweetIds = seenTweetIdsContainer.seenTweetIds;
+		seenTweetIds = {};
+		seenTweetIdsContainer.forEach(({ id, timestamp }) => {
+			seenTweetIds[id] = timestamp;
+		});
 	}
 
 	const userPromises = [];
@@ -117,53 +117,62 @@ Promise.all([
 		if (!seenTweetIdsToUpdate.length) {
 			console.log('no updates!');
 			process.exit(0);
+			return;
 		}
 
 		if (DEBUG) {
 			process.exit(0);
 		}
-		SeenTweetIdsModel.findOne(undefined)
-			.exec()
-			.then(seenTweetIdsContainer => {
-				let seenTweetIds;
-				if (!seenTweetIdsContainer) {
-					seenTweetIds = {};
-				} else {
-					seenTweetIds = seenTweetIdsContainer.seenTweetIds;
+
+		// Cull out old tweets, delete anything older than 6 hours
+		SeenTweetIdModel.deleteMany(
+			{ timestamp: { $lte: now - 6 * 60 * 60 * 1000 } },
+			err => {
+				if (err) {
+					console.log('Error culling the seen tweet database');
 				}
+				console.log('i think i deleted some, maybe');
+			},
+		);
 
-				// cull out anything where the ts is older than 6 hours
-				Object.keys(seenTweetIds).forEach(id => {
-					const timestamp = seenTweetIds[id];
-					if (timestamp === true) {
-						delete seenTweetIds[id];
-					} else if (now - timestamp > 6 * 60 * 60 * 1000) {
-						console.log('I should delete this old tweet');
-						delete seenTweetIds[id];
+		const seenTweetIdsUpdatesPromises = [];
+		let count = 0;
+		seenTweetIdsToUpdate.forEach(id => {
+			const promise = new Promise((resolve, reject) => {
+				// store the new user to follow, if we aren't already storing them!
+				SeenTweetIdModel.findOne({ id }, (err, response) => {
+					if (err) {
+						console.log(`Error querying the database for ${id}`);
+						return;
 					}
-				});
+					if (response) {
+						// Nothing to do, we're already storing this tweet.
+						resolve();
+						return;
+					}
 
-				seenTweetIdsToUpdate.forEach(tweetId => {
-					seenTweetIds[tweetId] = now;
-				});
-
-				// remove old map, we've got a new one to store!
-				SeenTweetIdsModel.remove(undefined, err => {
-					const newSeenTweetIdsModel = new SeenTweetIdsModel({
-						seenTweetIds,
+					const newSeenTweetId = new SeenTweetIdModel({
+						id,
+						timestamp: now,
 					});
-					// store the new map!
-					newSeenTweetIdsModel.save(saveErr => {
+
+					newSeenTweetId.save(saveErr => {
 						if (saveErr) {
 							console.log('Error saving to database', saveErr);
 						}
-						console.log(
-							`done! Saved ${seenTweetIdsToUpdate.length} new tweets!`,
-						);
-						process.exit(0);
+						console.log(`done! Now storing tweet ${id}!`);
+						count++;
+						resolve();
 					});
 				});
 			});
+			seenTweetIdsUpdatesPromises.push(promise);
+		});
+
+		Promise.all(seenTweetIdsUpdatesPromises).then(() => {
+			console.log(`done! Saved ${count} new tweets!`);
+			process.exit(0);
+		});
 	});
 });
 

@@ -176,8 +176,10 @@ app.get('/users/:username', (req, res) => {
 			const data = result.data[0];
 			res.json({
 				preferredUsername: username,
-				name: `${data.name}`,
-				summary: `${data.description}`,
+				name: `🤖 ${data.name}`,
+				summary: `${
+					data.description
+				} (this is a fake account, acting as a bridge to a real twitter account. You cannot follow it, only the developer can)`,
 				url: `${domain}/@${username}`,
 				image: [
 					{

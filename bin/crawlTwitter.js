@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 const Twit = require('twit');
 const sendMessage = require('../src/send-message');
 
+const mockFollowersArray = require('../src/mock-followers-array');
+
 const domain = process.env.DOMAIN;
 
 const T = new Twit({
@@ -36,7 +38,8 @@ const SeenTweetIdsModel = mongoose.model('SeenTweetIdsModel', {
 Promise.all([
 	FollowerUsernamesModel.findOne(undefined).exec(),
 	SeenTweetIdsModel.findOne(undefined).exec(),
-]).then(([followerUsernamesContainer, seenTweetIdsContainer]) => {
+	fetchFollowers(),
+]).then(([followerUsernamesContainer, seenTweetIdsContainer, followerIds]) => {
 	const seenTweetIdsToUpdate = [];
 	let followerUsernames;
 	let seenTweetIds;
@@ -75,6 +78,15 @@ Promise.all([
 							2 * 60 * 60 * 1000
 						) {
 							// Tweet is old, ignore it
+							return;
+						}
+
+						if (
+							tweet.in_reply_to_user_id &&
+							followerIds.indexOf(tweet.in_reply_to_user_id) === -1
+						) {
+							// don't post tweet if it's in reply to someone
+							// @nuncamind doesn't follow!
 							return;
 						}
 
@@ -163,4 +175,14 @@ function postTweet(tweet) {
 	};
 
 	return sendMessage(message, user, 'mastodon.social');
+}
+
+function fetchFollowers() {
+	// TODO check process.env.DEBUG instead once the real implementation lands
+	if (mockFollowersArray) {
+		return Promise.resolve(mockFollowersArray);
+	}
+
+	// TODO actually fetch the followers, perhaps persisting in a database also
+	// The code is in tweet-test.js, just port it over dude!
 }

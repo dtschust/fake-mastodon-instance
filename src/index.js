@@ -84,23 +84,19 @@ app.post('/inbox', (req, res) => {
 	console.log('got an inbox post!', JSON.stringify(req.body));
 	// TODO: verify signature or whatever.
 
-	// Ignore anything that doesn't come from my account, hardcoded for now
-	if (req.body.actor !== 'https://mastodon.social/users/nuncatest') {
-		res.status(202).end();
-		return;
-	}
-
 	console.log('HEADERS:', req.headers);
 	// TODO: validate signature I guess
 	if (req.body.type === 'Follow') {
 		let userToAdd = req.body.object.split('/');
 		userToAdd = userToAdd[userToAdd.length - 1];
 		console.log('wants to follow', userToAdd);
+		const shouldAccept =
+			req.body.actor === 'https://mastodon.social/users/nuncatest';
 		const id = Date.now();
 		const message = {
 			'@context': 'https://www.w3.org/ns/activitystreams',
-			id: `${domain}/users/${userToAdd}#accepts/follows/${id}`,
-			type: 'Accept',
+			id: `${domain}/users/${userToAdd}#acceptsOrRejects/follows/${id}${Date.now()}`,
+			type: shouldAccept ? 'Accept' : 'Reject',
 			actor: req.body.object,
 			object: {
 				id: req.body.id,
@@ -114,13 +110,19 @@ app.post('/inbox', (req, res) => {
 			res.status(202).end();
 		});
 
-		// TODO: Add this user to the list of followers, update the database.
-		addNewFollowerToList(userToAdd);
+		if (shouldAccept) {
+			addNewFollowerToList(userToAdd);
+		}
 		// TODO: Maybe manually trigger a crawl of this user instead of waiting for the crawler
 
 		// TODO: support unfollows
 		// I don't need to send an accept I don't think, since I didn't get one when I did an unfollow.
 		// I just need to unfollow the person
+	}
+
+	// Ignore anything that doesn't come from my account, hardcoded for now
+	if (req.body.actor !== 'https://mastodon.social/users/nuncatest') {
+		res.status(202).end();
 	}
 });
 

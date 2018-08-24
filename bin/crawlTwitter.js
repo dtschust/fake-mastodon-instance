@@ -62,11 +62,6 @@ Promise.all([
 		seenTweetIds = seenTweetIdsContainer.seenTweetIds;
 	}
 
-	console.log(
-		`Following ${followingUsernames.length} users.`,
-		followingUsernames,
-	);
-
 	const userPromises = [];
 	const now = Date.now();
 	followingUsernames.forEach(followerUsername => {

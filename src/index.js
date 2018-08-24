@@ -40,12 +40,23 @@ function addNewFollowerToList(username) {
 	const newFollowingUsername = new FollowingUsernameModel({
 		username,
 	});
-	// store the new user to follow!
-	newFollowingUsername.save(saveErr => {
-		if (saveErr) {
-			console.log('Error saving to database', saveErr);
+	// store the new user to follow, if we aren't already storing them!
+	FollowingUsernameModel.findOne({ username }, (err, response) => {
+		if (err) {
+			console.log(`Error querying the database for ${username}`);
+			return;
 		}
-		console.log(`done! Now following ${username}!`);
+		if (response) {
+			// Nothing to do, we're already following this person.
+			return;
+		}
+
+		newFollowingUsername.save(saveErr => {
+			if (saveErr) {
+				console.log('Error saving to database', saveErr);
+			}
+			console.log(`done! Now following ${username}!`);
+		});
 	});
 }
 

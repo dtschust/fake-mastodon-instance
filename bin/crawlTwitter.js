@@ -210,7 +210,7 @@ function fetchFollowers(prevFollowerIds = [], next_cursor) {
 			return fetchFollowers(followerIds, response.data.next_cursor);
 		}
 
-		console.log(`nuncamind has ${followerIds.length} followers`);
+		console.log(`nuncamind is following ${followerIds.length} accounts`);
 		return followerIds;
 	});
 }

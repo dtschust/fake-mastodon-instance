@@ -59,8 +59,11 @@ let text = twitter.autoLinkWithJSON(tweettxt, entities);
 if (entities.user_mentions && entities.user_mentions.length) {
 	entities.user_mentions.forEach(({ screenName }) => {
 		text = text.replace(
-			new RegExp(`>${screenName}</a>`, 'g'),
-			`>${screenName}@twitter.com</a>`,
+			new RegExp(
+				`@<a class="tweet-url username" href="https://twitter.com/${screenName}" data-screen-name="${screenName}" rel="nofollow">${screenName}</a>`,
+				'g',
+			),
+			`<a href="https://xoxo.zone/@br" class="u-url mention">@${screenName}@twitter.com</a>`,
 		);
 	});
 }

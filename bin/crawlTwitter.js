@@ -153,16 +153,21 @@ Promise.all([
 });
 
 function postTweet(tweet) {
+	const { entities } = tweet;
 	const user = tweet.user.screen_name;
 	const id = tweet.id_str;
-	let content = twitter.autoLinkWithJSON(tweet.full_text, tweet.entities);
+	let content =
+		'<p>' + twitter.autoLinkWithJSON(tweet.full_text, tweet.entities) + '</p>';
 
 	// Convert @user to look like @user@twitter.com to be less confusing
-	if (tweet.entities.user_mentions && tweet.entities.user_mentions.length) {
-		tweet.entities.user_mentions.forEach(({ screenName }) => {
+	if (entities.user_mentions && entities.user_mentions.length) {
+		entities.user_mentions.forEach(({ screenName }) => {
 			content = content.replace(
-				new RegExp(`>${screenName}</a>`, 'g'),
-				`>${screenName}@twitter.com</a>`,
+				new RegExp(
+					`@<a class="tweet-url username" href="https://twitter.com/${screenName}" data-screen-name="${screenName}" rel="nofollow">${screenName}</a>`,
+					'g',
+				),
+				`<a href="${domain}/@${screenName.toLowerCase()}" class="u-url mention">@${screenName}</a>`,
 			);
 		});
 	}
@@ -183,6 +188,19 @@ function postTweet(tweet) {
 			to: 'https://www.w3.org/ns/activitystreams#Public', // TODO figure out how to make these not public
 		},
 	};
+
+	// iterate through user mentions and add tags to the message object, so
+	// mastodon knows about these mentions
+	const domainWithoutHttps = domain.replace('https://', '');
+	if (entities.user_mentions && entities.user_mentions.length) {
+		message.object.tag = entities.user_mentions.map(({ screenName }) => {
+			return {
+				type: 'Mention',
+				href: `${domain}/users/${screenName.toLowerCase()}`,
+				name: `@${screenName.toLowerCase()}@${domainWithoutHttps}`,
+			};
+		});
+	}
 
 	if (DEBUG) {
 		return Promise.resolve();

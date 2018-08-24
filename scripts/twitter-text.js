@@ -1,8 +1,8 @@
 const twitter = require('twitter-text');
 
-var tweettxt =
+const tweettxt =
 	'@BalloonAF lmao this is all I need to roast you😂 look like a damn chipmunk gtfo my mentions😂 http://t.co/YKvfV1z3Z8';
-var entities = {
+const entities = {
 	hashtags: [],
 	symbols: [],
 	urls: [],

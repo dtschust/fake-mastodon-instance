@@ -1,7 +1,7 @@
 require('dotenv').config();
-var Twit = require('twit');
+const Twit = require('twit');
 
-var T = new Twit({
+const T = new Twit({
 	consumer_key: process.env.TWITTER_CONSUMER_KEY,
 	consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
 	access_token: process.env.TWITTER_ACCESS_TOKEN,
@@ -23,7 +23,7 @@ T.get(
 		tweet_mode: 'extended',
 		trim_user: true,
 	},
-	function(err, data, response) {
+	(err, data /* , response */) => {
 		console.log(JSON.stringify(data[9]));
 	},
 );

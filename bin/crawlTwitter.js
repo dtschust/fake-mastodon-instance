@@ -131,14 +131,13 @@ Promise.all([
 				if (err) {
 					console.log('Error culling the seen tweet database');
 				}
-				console.log('i think i deleted some, maybe');
 			},
 		);
 
 		const seenTweetIdsUpdatesPromises = [];
 		let count = 0;
 		seenTweetIdsToUpdate.forEach(id => {
-			const promise = new Promise((resolve, reject) => {
+			const promise = new Promise(resolve => {
 				// store the new user to follow, if we aren't already storing them!
 				SeenTweetIdModel.findOne({ id }, (err, response) => {
 					if (err) {
@@ -161,7 +160,7 @@ Promise.all([
 							console.log('Error saving to database', saveErr);
 						}
 						console.log(`done! Now storing tweet ${id}!`);
-						count++;
+						count += 1;
 						resolve();
 					});
 				});
@@ -180,8 +179,10 @@ function postTweet(tweet) {
 	const { entities } = tweet;
 	const user = tweet.user.screen_name;
 	const id = tweet.id_str;
-	let content =
-		'<p>' + twitter.autoLinkWithJSON(tweet.full_text, tweet.entities) + '</p>';
+	let content = `<p>${twitter.autoLinkWithJSON(
+		tweet.full_text,
+		tweet.entities,
+	)}</p>`;
 
 	// Convert @user to look like @user@twitter.com to be less confusing
 	if (entities.user_mentions && entities.user_mentions.length) {
@@ -217,13 +218,11 @@ function postTweet(tweet) {
 	// mastodon knows about these mentions
 	const domainWithoutHttps = domain.replace('https://', '');
 	if (entities.user_mentions && entities.user_mentions.length) {
-		message.object.tag = entities.user_mentions.map(({ screenName }) => {
-			return {
-				type: 'Mention',
-				href: `${domain}/users/${screenName.toLowerCase()}`,
-				name: `@${screenName.toLowerCase()}@${domainWithoutHttps}`,
-			};
-		});
+		message.object.tag = entities.user_mentions.map(({ screenName }) => ({
+			type: 'Mention',
+			href: `${domain}/users/${screenName.toLowerCase()}`,
+			name: `@${screenName.toLowerCase()}@${domainWithoutHttps}`,
+		}));
 	}
 
 	if (DEBUG) {
@@ -231,7 +230,7 @@ function postTweet(tweet) {
 	}
 	return sendMessage(message, user, 'mastodon.social');
 }
-
+// eslint-disable-next-line camelcase
 function fetchFollowers(prevFollowerIds = [], next_cursor) {
 	if (DEBUG) {
 		return Promise.resolve(mockFollowersArray);

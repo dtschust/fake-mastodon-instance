@@ -1,4 +1,6 @@
 require('dotenv').config();
+
+// eslint-disable-next-line import/no-extraneous-dependencies
 const request = require('request');
 const crypto = require('crypto');
 
@@ -15,13 +17,13 @@ console.log(privkey);
 console.log(message);
 
 const signer = crypto.createSign('sha256');
-let d = new Date();
-let stringToSign = `(request-target): post /inbox\nhost: ${theirDomain}\ndate: ${d.toUTCString()}`; // TODO hardcoded host
+const d = new Date();
+const stringToSign = `(request-target): post /inbox\nhost: ${theirDomain}\ndate: ${d.toUTCString()}`; // TODO hardcoded host
 signer.update(stringToSign);
-signer.end;
+signer.end(); // I think this is ok? it used to just be signer.end which would be a noop
 const signature = signer.sign(privkey);
-const signature_b64 = signature.toString('base64');
-let header = `keyId="${domain}/users/${username}",headers="(request-target) host date",signature="${signature_b64}"`;
+const signatureB64 = signature.toString('base64');
+const header = `keyId="${domain}/users/${username}",headers="(request-target) host date",signature="${signatureB64}"`;
 
 console.log('signature:', header);
 request(
@@ -36,7 +38,7 @@ request(
 		json: true,
 		body: message,
 	},
-	function(error, response, body) {
+	(error, response /* , body */) => {
 		console.log('Response: ', error, response.body, response.statusCode);
 	},
 );

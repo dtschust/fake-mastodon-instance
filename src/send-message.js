@@ -1,4 +1,5 @@
 require('dotenv').config();
+// eslint-disable-next-line import/no-extraneous-dependencies
 const request = require('request');
 const crypto = require('crypto');
 
@@ -7,13 +8,13 @@ const cert = process.env.INSTANCE_PRIVATE_KEY;
 
 module.exports = function sendMessage(message, name, destinationDomain, cb) {
 	const signer = crypto.createSign('sha256');
-	let d = new Date();
-	let stringToSign = `(request-target): post /inbox\nhost: ${destinationDomain}\ndate: ${d.toUTCString()}`; // TODO hardcoded host
+	const d = new Date();
+	const stringToSign = `(request-target): post /inbox\nhost: ${destinationDomain}\ndate: ${d.toUTCString()}`; // TODO hardcoded host
 	signer.update(stringToSign);
-	signer.end;
+	signer.end();
 	const signature = signer.sign(cert);
-	const signature_b64 = signature.toString('base64');
-	let header = `keyId="${domain}/users/${name}",headers="(request-target) host date",signature="${signature_b64}"`;
+	const signatureB64 = signature.toString('base64');
+	const header = `keyId="${domain}/users/${name}",headers="(request-target) host date",signature="${signatureB64}"`;
 
 	// console.log('signature:', header);
 	// console.log('Sending message', message);
@@ -30,7 +31,7 @@ module.exports = function sendMessage(message, name, destinationDomain, cb) {
 				json: true,
 				body: message,
 			},
-			function(error, response, body) {
+			(error, response, body) => {
 				// console.log('Response: ', error, response.body, response.statusCode);
 				if (error) {
 					reject(error);

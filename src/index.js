@@ -2,9 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const Twit = require('twit');
-const sendMessage = require('./send-message');
 const mongoose = require('mongoose');
 const useragent = require('useragent');
+const sendMessage = require('./send-message');
 
 function isMobileSafari(ua) {
 	try {
@@ -65,9 +65,6 @@ const app = express();
 
 const domain = process.env.DOMAIN;
 
-const key = process.env.INSTANCE_PUBLIC_KEY;
-const cert = process.env.INSTANCE_PRIVATE_KEY;
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(
@@ -112,15 +109,10 @@ app.post('/inbox', (req, res) => {
 				object: req.body.object,
 			},
 		};
-		sendMessage(
-			message,
-			userToAdd,
-			'mastodon.social',
-			(error, response, body) => {
-				// TODO dynamic domain
-				res.status(202).end();
-			},
-		);
+		sendMessage(message, userToAdd, 'mastodon.social', () => {
+			// TODO dynamic domain
+			res.status(202).end();
+		});
 
 		// TODO: Add this user to the list of followers, update the database.
 		addNewFollowerToList(userToAdd);
@@ -157,7 +149,7 @@ app.get('/@:user', (req, res) => {
 app.get('/users/:username', (req, res) => {
 	// TODO: cache these profiles.
 	// TODO: figure out how to invalidate caches for profiles as well, the other instances have their own caches
-	const username = req.params.username;
+	const { username } = req.params;
 	console.log(
 		req.path,
 		`username ${req.params.username} requested!`,

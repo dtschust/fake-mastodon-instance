@@ -52,14 +52,16 @@ Promise.all([
 	}
 
 	const userPromises = [];
+	const now = Date.now();
 	followerUsernames.forEach(followerUsername => {
 		const tweetsForUserPromises = [];
 		userPromises.push(
 			T.get('statuses/user_timeline', {
 				screen_name: followerUsername,
 				count: 100,
-				exclude_replies: true,
+				exclude_replies: false,
 				include_rts: false,
+				tweet_mode: 'extended',
 			})
 				.then(result => {
 					result.data.forEach(tweet => {
@@ -67,6 +69,15 @@ Promise.all([
 							// Already posted this tweet, move along!
 							return;
 						}
+
+						if (
+							now - new Date(tweet.created_at).getTime() >
+							2 * 60 * 60 * 1000
+						) {
+							// Tweet is old, ignore it
+							return;
+						}
+
 						tweetsForUserPromises.push(
 							postTweet(tweet).then(() => {
 								// console.log('post tweet complete!');
@@ -77,7 +88,7 @@ Promise.all([
 					return Promise.all(tweetsForUserPromises);
 				})
 				.catch(e => {
-					console.log('ERROR!', followerUsername);
+					console.log('ERROR!', followerUsername, e);
 				}),
 		);
 	});
@@ -122,7 +133,17 @@ Promise.all([
 function postTweet(tweet) {
 	const user = tweet.user.screen_name;
 	const id = tweet.id_str;
-	const content = twitter.autoLinkWithJSON(tweet.text, tweet.entities);
+	let content = twitter.autoLinkWithJSON(tweet.full_text, tweet.entities);
+
+	// Convert @user to look like @user@twitter.com to be less confusing
+	if (tweet.entities.user_mentions && tweet.entities.user_mentions.length) {
+		tweet.entities.user_mentions.forEach(({ screenName }) => {
+			content = content.replace(
+				new RegExp(`>${screenName}</a>`, 'g'),
+				`>${screenName}@twitter.com</a>`,
+			);
+		});
+	}
 	const message = {
 		'@context': 'https://www.w3.org/ns/activitystreams',
 

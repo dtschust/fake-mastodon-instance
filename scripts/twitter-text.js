@@ -53,4 +53,16 @@ var entities = {
 		},
 	],
 };
-console.log(twitter.autoLinkWithJSON(tweettxt, entities));
+
+let text = twitter.autoLinkWithJSON(tweettxt, entities);
+
+if (entities.user_mentions && entities.user_mentions.length) {
+	entities.user_mentions.forEach(({ screenName }) => {
+		text = text.replace(
+			new RegExp(`>${screenName}</a>`, 'g'),
+			`>${screenName}@twitter.com</a>`,
+		);
+	});
+}
+
+console.log(text);

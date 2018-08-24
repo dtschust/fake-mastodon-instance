@@ -126,8 +126,16 @@ Promise.all([
 					seenTweetIds = seenTweetIdsContainer.seenTweetIds;
 				}
 
-				// TODO: go through all of seenTweetIds and
-				// cull out anything where the ts is older than 12 hours
+				// cull out anything where the ts is older than 6 hours
+				Object.keys(seenTweetIds).forEach(id => {
+					const timestamp = seenTweetIds[id];
+					if (timestamp === true) {
+						delete seenTweetIds[id];
+					} else if (now - timestamp > 6 * 60 * 60 * 1000) {
+						console.log('I should delete this old tweet');
+						delete seenTweetIds[id];
+					}
+				});
 
 				seenTweetIdsToUpdate.forEach(tweetId => {
 					seenTweetIds[tweetId] = now;

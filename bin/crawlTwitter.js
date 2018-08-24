@@ -56,7 +56,7 @@ Promise.all([
 		userPromises.push(
 			T.get('statuses/user_timeline', {
 				screen_name: followerUsername,
-				count: 3,
+				count: 100,
 				exclude_replies: true,
 				include_rts: false,
 			}).then(result => {
@@ -67,7 +67,7 @@ Promise.all([
 					}
 					tweetsForUserPromises.push(
 						postTweet(tweet).then(() => {
-							console.log('post tweet complete!');
+							// console.log('post tweet complete!');
 							seenTweetIdsToUpdate.push(tweet.id);
 						}),
 					);
@@ -136,7 +136,7 @@ function postTweet(tweet) {
 	};
 
 	return sendMessage(message, user, 'mastodon.social').then(body => {
-		console.log('message sent to mastodon!');
+		// console.log('message sent to mastodon!');
 		// TODO hardcoded destination domain
 	});
 }

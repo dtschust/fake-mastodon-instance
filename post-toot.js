@@ -10,6 +10,9 @@ const message = {
 	"id": `https://fake-mastodon-instance.herokuapp.com/${id}`,
 	"type": "Create",
 	"actor": `https://fake-mastodon-instance.herokuapp.com/users/${user}`,
+	"to": "https://www.w3.org/ns/activitystreams#Public", // TODO figure out how to make these not public
+	// "to": [ "https://mastodon.social/users/nuncatest" ], // TODO figure out how to make these not public
+	// "to": [ `https://fake-mastodon-instance.herokuapp.com/users/${user}/followers` ], // TODO figure out how to make these not public
 
 	"object": {
 		"id": `https://fake-mastodon-instance.herokuapp.com/${noteId}`,
@@ -17,8 +20,9 @@ const message = {
 		"published": `${new Date().toISOString()}`,
 		"attributedTo": `https://fake-mastodon-instance.herokuapp.com/users/${user}`,
 		"content": "<p>Are _we_ ok?</p>",
-		"to": "https://www.w3.org/ns/activitystreams#Public" // TODO figure out how to make these not public
-		// "to": [ "https://mastodon.social/users/nuncatest" ] // TODO figure out how to make these not public
+		"to": "https://www.w3.org/ns/activitystreams#Public", // TODO figure out how to make these not public
+		// "to": [ "https://mastodon.social/users/nuncatest" ], // TODO figure out how to make these not public
+		// "to": [ `https://fake-mastodon-instance.herokuapp.com/users/${user}/followers` ], // TODO figure out how to make these not public
 	}
 }
 

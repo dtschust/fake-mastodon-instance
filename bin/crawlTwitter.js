@@ -69,7 +69,8 @@ Promise.all([
 				tweet_mode: 'extended',
 			})
 				.then(result => {
-					result.data.forEach(tweet => {
+					const tweetsInReverseOrder = result.data.slice().reverse();
+					tweetsInReverseOrder.forEach(tweet => {
 						if (seenTweetIds[tweet.id]) {
 							// Already posted this tweet, move along!
 							return;

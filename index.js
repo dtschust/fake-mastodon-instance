@@ -95,6 +95,8 @@ signatureValue: 'Wh0v2QugV7OJV1ON4pKBD4yEtlMy6QSyx6ZBR9jesMz7sjbjsRznDlhnKcHe4/U
 		// TODO: Maybe manually trigger a crawl of this user instead of waiting for the crawler
 
 		// TODO: support unfollows
+		// I don't need to send an accept I don't think, since I didn't get one when I did an unfollow.
+		// I just need to unfollow the person
 	}
 });
 

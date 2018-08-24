@@ -81,7 +81,7 @@ app.post('/inbox', (req, res) => {
 	if (req.body.type === 'Delete') {
 		res.status(202).end();
 	}
-	console.log('got an inbox post!', req.body);
+	console.log('got an inbox post!', JSON.stringify(req.body));
 	// TODO: verify signature or whatever.
 
 	// Ignore anything that doesn't come from my account, hardcoded for now

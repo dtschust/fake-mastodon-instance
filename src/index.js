@@ -4,6 +4,16 @@ const bodyParser = require('body-parser');
 const Twit = require('twit');
 const sendMessage = require('./send-message');
 const mongoose = require('mongoose');
+const useragent = require('useragent');
+
+function isMobileSafari(ua) {
+	try {
+		return useragent.parse(ua).family.indexOf('Mobile Safari') !== -1;
+	} catch (e) {
+		// whatever, do nothing
+		return false;
+	}
+}
 
 const T = new Twit({
 	consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -130,22 +140,25 @@ app.post('/inbox', (req, res) => {
 });
 
 app.get('/status/:user/:id', (req, res) => {
-	res.redirect(301, `tweetbot://${req.params.user}/status/${req.params.id}`);
-
-	// TODO: figure out if tweetbot is supported, and if not redirect to twitter.com
-	// res.redirect(
-	// 	301,
-	// 	`https://twitter.com/${req.params.user}/status/${req.params.id}`,
-	// );
+	if (isMobileSafari(req.headers['user-agent'])) {
+		res.redirect(301, `tweetbot://${req.params.user}/status/${req.params.id}`);
+	} else {
+		res.redirect(
+			301,
+			`https://twitter.com/${req.params.user}/status/${req.params.id}`,
+		);
+	}
 });
 
 app.get('/@:user', (req, res) => {
-	res.redirect(
-		301,
-		`tweetbot://${req.params.user}/user_profile/${req.params.user}`,
-	);
-	// TODO: figure out if tweetbot is supported, and if not redirect to twitter.com
-	// res.redirect(301, `https://twitter.com/${req.params.user}`);
+	if (isMobileSafari(req.headers['user-agent'])) {
+		res.redirect(
+			301,
+			`tweetbot://${req.params.user}/user_profile/${req.params.user}`,
+		);
+	} else {
+		res.redirect(301, `https://twitter.com/${req.params.user}`);
+	}
 });
 
 app.get('/users/:username', (req, res) => {

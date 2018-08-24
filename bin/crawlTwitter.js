@@ -135,13 +135,12 @@ function postTweet(tweet) {
 	const id = tweet.id_str;
 	let content = twitter.autoLinkWithJSON(tweet.full_text, tweet.entities);
 
-	// Convert @user to look like @user@domain.com to be less confusing
-	const domainWithoutHttps = domain.replace('https://', '');
+	// Convert @user to look like @user@twitter.com to be less confusing
 	if (tweet.entities.user_mentions && tweet.entities.user_mentions.length) {
 		tweet.entities.user_mentions.forEach(({ screenName }) => {
 			content = content.replace(
 				new RegExp(`>${screenName}</a>`, 'g'),
-				`>${screenName}@${domainWithoutHttps}</a>`,
+				`>${screenName}@twitter.com</a>`,
 			);
 		});
 	}

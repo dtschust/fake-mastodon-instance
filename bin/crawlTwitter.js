@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 require('dotenv').config();
+const twitter = require('twitter-text');
 const mongoose = require('mongoose');
 const Twit = require('twit');
 const sendMessage = require('../src/send-message');
@@ -117,6 +118,7 @@ Promise.all([
 function postTweet(tweet) {
 	const user = tweet.user.screen_name;
 	const id = tweet.id_str;
+	const content = twitter.autoLinkWithJSON(tweet.text, tweet.entities);
 	const message = {
 		'@context': 'https://www.w3.org/ns/activitystreams',
 
@@ -130,7 +132,7 @@ function postTweet(tweet) {
 			type: 'Note',
 			published: new Date(tweet.created_at).toISOString(),
 			attributedTo: `${domain}/users/${user}`,
-			content: tweet.text,
+			content,
 			to: 'https://www.w3.org/ns/activitystreams#Public', // TODO figure out how to make these not public
 		},
 	};

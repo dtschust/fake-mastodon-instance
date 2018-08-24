@@ -32,40 +32,21 @@ mongoose.connect(
 	},
 );
 
-const FollowerUsernamesModel = mongoose.model('FollowerUsernamesModel', {
-	followerUsernames: [String],
+const FollowingUsernameModel = mongoose.model('FollowingUsername', {
+	username: String,
 });
 
-function addNewFollowerToList(userToAdd) {
-	FollowerUsernamesModel.findOne(undefined)
-		.exec()
-		.then(followerUsernamesContainer => {
-			let followerUsernames;
-			if (!followerUsernamesContainer) {
-				followerUsernames = [];
-			} else {
-				followerUsernames = followerUsernamesContainer.followerUsernames;
-			}
-			if (followerUsernames.indexOf(userToAdd) !== -1) {
-				console.log(`Already following ${userToAdd}!`);
-				return;
-			}
-
-			followerUsernames.push(userToAdd);
-			// remove old map, we've got a new one to store!
-			FollowerUsernamesModel.remove(undefined, err => {
-				const newFollowerUsernames = new FollowerUsernamesModel({
-					followerUsernames,
-				});
-				// store the new map!
-				newFollowerUsernames.save(saveErr => {
-					if (saveErr) {
-						console.log('Error saving to database', saveErr);
-					}
-					console.log(`done! Now following ${userToAdd}!`);
-				});
-			});
-		});
+function addNewFollowerToList(username) {
+	const newFollowingUsername = new FollowingUsernameModel({
+		username,
+	});
+	// store the new user to follow!
+	newFollowerUsernames.save(saveErr => {
+		if (saveErr) {
+			console.log('Error saving to database', saveErr);
+		}
+		console.log(`done! Now following ${username}!`);
+	});
 }
 
 const app = express();

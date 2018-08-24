@@ -130,14 +130,22 @@ app.post('/inbox', (req, res) => {
 });
 
 app.get('/status/:user/:id', (req, res) => {
-	res.redirect(
-		301,
-		`https://twitter.com/${req.params.user}/status/${req.params.id}`,
-	);
+	res.redirect(301, `tweetbot://${req.params.user}/status/${req.params.id}`);
+
+	// TODO: figure out if tweetbot is supported, and if not redirect to twitter.com
+	// res.redirect(
+	// 	301,
+	// 	`https://twitter.com/${req.params.user}/status/${req.params.id}`,
+	// );
 });
 
 app.get('/@:user', (req, res) => {
-	res.redirect(301, `https://twitter.com/${req.params.user}`);
+	res.redirect(
+		301,
+		`tweetbot://${req.params.user}/user_profile/${req.params.user}`,
+	);
+	// TODO: figure out if tweetbot is supported, and if not redirect to twitter.com
+	// res.redirect(301, `https://twitter.com/${req.params.user}`);
 });
 
 app.get('/users/:username', (req, res) => {

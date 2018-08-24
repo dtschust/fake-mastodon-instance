@@ -29,8 +29,12 @@ mongoose.connect(
 	},
 );
 
-const FollowerUsernamesModel = mongoose.model('FollowerUsernamesModel', {
-	followerUsernames: [String],
+const FollowingUsernameModel = mongoose.model('FollowingUsername', {
+	username: String,
+});
+
+const SeenTweetIdModel = mongoose.model('SeenTweetIdModel', {
+	timestamp: Number,
 });
 
 const SeenTweetIdsModel = mongoose.model('SeenTweetIdsModel', {
@@ -38,7 +42,7 @@ const SeenTweetIdsModel = mongoose.model('SeenTweetIdsModel', {
 });
 
 Promise.all([
-	FollowerUsernamesModel.findOne(undefined).exec(),
+	FollowingUsernameModel.find(undefined).exec(),
 	SeenTweetIdsModel.findOne(undefined).exec(),
 	fetchFollowers(),
 ]).then(([followerUsernamesContainer, seenTweetIdsContainer, followerIds]) => {
@@ -48,13 +52,20 @@ Promise.all([
 	if (!followerUsernamesContainer) {
 		followerUsernames = [];
 	} else {
-		followerUsernames = followerUsernamesContainer.followerUsernames;
+		followerUsernames = followerUsernamesContainer.map(
+			({ username }) => username,
+		);
 	}
 	if (!seenTweetIdsContainer) {
 		seenTweetIds = {};
 	} else {
 		seenTweetIds = seenTweetIdsContainer.seenTweetIds;
 	}
+
+	console.log(
+		`Following ${followerUsernames.length} users.`,
+		followerUsernames,
+	);
 
 	const userPromises = [];
 	const now = Date.now();

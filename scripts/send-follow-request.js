@@ -4,16 +4,19 @@ require('dotenv').config();
 const request = require('request');
 const crypto = require('crypto');
 
-const message = require('./follow-request.json');
-
-message.id += Date.now();
-
 const domain = 'https://fake-mastodon-instance.herokuapp.com';
 const privkey = process.env.INSTANCE_PRIVATE_KEY;
-const username = 'dril';
+const username = 'speakerpaulryan';
 const theirDomain = 'mastodon.social';
 
-console.log(privkey);
+const message = {
+	'@context': 'https://www.w3.org/ns/activitystreams',
+	id: `https://fake-mastodon-instance.herokuapp.com/follow-requests/${Date.now()}`,
+	type: 'Follow',
+	actor: `${domain}/users/${username}`,
+	object: 'https://mastodon.social/users/nuncatest',
+};
+
 console.log(message);
 
 const signer = crypto.createSign('sha256');

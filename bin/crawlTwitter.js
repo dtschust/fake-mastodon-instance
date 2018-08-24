@@ -45,14 +45,14 @@ Promise.all([
 	FollowingUsernameModel.find(undefined).exec(),
 	SeenTweetIdsModel.findOne(undefined).exec(),
 	fetchFollowers(),
-]).then(([followerUsernamesContainer, seenTweetIdsContainer, followerIds]) => {
+]).then(([followingUsernameContainer, seenTweetIdsContainer, followerIds]) => {
 	const seenTweetIdsToUpdate = [];
-	let followerUsernames;
+	let followingUsernames;
 	let seenTweetIds;
-	if (!followerUsernamesContainer) {
-		followerUsernames = [];
+	if (!followingUsernameContainer) {
+		followingUsernames = [];
 	} else {
-		followerUsernames = followerUsernamesContainer.map(
+		followingUsernames = followingUsernameContainer.map(
 			({ username }) => username,
 		);
 	}
@@ -63,13 +63,13 @@ Promise.all([
 	}
 
 	console.log(
-		`Following ${followerUsernames.length} users.`,
-		followerUsernames,
+		`Following ${followingUsernames.length} users.`,
+		followingUsernames,
 	);
 
 	const userPromises = [];
 	const now = Date.now();
-	followerUsernames.forEach(followerUsername => {
+	followingUsernames.forEach(followerUsername => {
 		const tweetsForUserPromises = [];
 		userPromises.push(
 			T.get('statuses/user_timeline', {

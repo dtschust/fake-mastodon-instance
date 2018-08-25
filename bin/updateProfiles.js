@@ -5,6 +5,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const Twit = require('twit');
 const sendMessage = require('../src/send-message');
+const getUserJson = require('../src/get-user-json');
 
 const domain = process.env.DOMAIN;
 
@@ -80,38 +81,7 @@ FollowingUsernameModel.find(undefined)
 						type: 'Update',
 						actor: `${domain}/users/${username}`,
 						to: ['https://www.w3.org/ns/activitystreams#Public'],
-						object: {
-							id: `${domain}/users/${username}`,
-							type: 'Person',
-							preferredUsername: username,
-							name: `🤖 ${data.name}`,
-							summary: `${
-								data.description
-							} (this is a fake account, acting as a bridge to a real twitter account. You cannot follow it, only the developer can)`,
-							url: `${domain}/@${username}`,
-							manuallyApprovesFollowers: true,
-							image: [
-								{
-									url: `${data.profile_banner_url}`,
-									type: 'Image',
-								},
-							],
-							inbox: `${domain}/inbox`,
-							icon: [
-								{
-									url: `${data.profile_image_url.replace(
-										'_normal',
-										'_400x400',
-									)}`,
-									type: 'Image',
-								},
-							],
-							publicKey: {
-								id: `${domain}/users/${username}#main-key`,
-								owner: `${domain}/users/${username}`,
-								publicKeyPem: process.env.INSTANCE_PUBLIC_KEY,
-							},
-						},
+						object: getUserJson(username, data),
 					};
 					userPromises.push(
 						sendMessage(profileUpdate, username, 'mastodon.social').then(

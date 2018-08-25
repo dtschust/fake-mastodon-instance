@@ -29,6 +29,36 @@ mongoose.connect(
 	},
 );
 
+const FollowingUsernameModel = mongoose.model('FollowingUsername', {
+	username: String,
+});
+
+FollowingUsernameModel.find(undefined)
+	.exec()
+	.then(followingUsernameContainer => {
+		const seenTweetIdsToUpdate = [];
+		let followingUsernames;
+		let seenTweetIds;
+		if (!followingUsernameContainer) {
+			followingUsernames = [];
+		} else {
+			followingUsernames = followingUsernameContainer.map(
+				({ username }) => username,
+			);
+		}
+		if (!seenTweetIdsContainer) {
+			seenTweetIds = {};
+		} else {
+			seenTweetIds = {};
+			seenTweetIdsContainer.forEach(({ id, timestamp }) => {
+				seenTweetIds[id] = timestamp;
+			});
+		}
+
+		const userPromises = [];
+		const now = Date.now();
+		followingUsernames.forEach(followerUsername => {});
+	});
 const username = 'nuncatest';
 T.get('users/lookup', { screen_name: username }).then(result => {
 	const data = result.data[0];

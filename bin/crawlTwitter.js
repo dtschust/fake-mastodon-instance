@@ -231,11 +231,10 @@ Promise.all([
 				});
 				seenTweetIdsUpdatesPromises.push(promise);
 			});
-		});
-
-		Promise.all(seenTweetIdsUpdatesPromises).then(() => {
-			console.log(`done! Saved ${count} new tweets!`);
-			process.exit(0);
+			Promise.all(seenTweetIdsUpdatesPromises).then(() => {
+				console.log(`done! Saved ${count} new tweets!`);
+				process.exit(0);
+			});
 		});
 	});
 });

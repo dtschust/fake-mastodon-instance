@@ -228,7 +228,7 @@ app.get('/users/:username/followers', (req, res) => {
 			],
 			id: `https://${domain}/users/${username}/followers`,
 			type: 'OrderedCollection',
-			totalItems: 1,
+			totalItems: 420,
 			first: `https://${domain}/users/${username}/followers?page=1`,
 		});
 	} else if (req.query.page === '1') {
@@ -256,7 +256,7 @@ app.get('/users/:username/followers', (req, res) => {
 			],
 			id: `${domain}/users/${username}/followers?page=1`,
 			type: 'OrderedCollectionPage',
-			totalItems: 1,
+			totalItems: 420,
 			partOf: `${domain}/users/${username}/followers`,
 			orderedItems: [
 				'https://mastodon.social/users/nuncatest', // TODO: this is hardcoded
@@ -287,7 +287,7 @@ app.get('/users/:username/followers', (req, res) => {
 			],
 			id: `${domain}/users/${username}/followers?page=${req.query.page}`,
 			type: 'OrderedCollectionPage',
-			totalItems: 1,
+			totalItems: 420,
 			partOf: `${domain}/users/${username}/followers`,
 			orderedItems: [],
 		});
@@ -328,7 +328,7 @@ app.get('/users/:username/following', (req, res) => {
 			],
 			id: `${domain}/users/${username}/following`,
 			type: 'OrderedCollection',
-			totalItems: 1,
+			totalItems: 420,
 			first: `${domain}/users/${username}/following?page=1`,
 		});
 	} else if (req.query.page === '1') {
@@ -356,7 +356,7 @@ app.get('/users/:username/following', (req, res) => {
 			],
 			id: `${domain}/users/${username}/following?page=1`,
 			type: 'OrderedCollectionPage',
-			totalItems: 1,
+			totalItems: 420,
 			partOf: `${domain}/users/${username}/following`,
 			orderedItems: [
 				'https://mastodon.social/users/nuncatest', // TODO: this is hardcoded
@@ -387,7 +387,7 @@ app.get('/users/:username/following', (req, res) => {
 			],
 			id: `${domain}/users/${username}/following?page=${req.query.page}`,
 			type: 'OrderedCollectionPage',
-			totalItems: 1,
+			totalItems: 420,
 			partOf: `${domain}/users/${username}/following`,
 			orderedItems: [],
 		});

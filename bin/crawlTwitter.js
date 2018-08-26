@@ -202,7 +202,6 @@ function postTweet(tweet) {
 		id: `${domain}/status-updates/${user}/status/${id}`,
 		type: 'Create',
 		actor: `${domain}/users/${user}`,
-		to: 'https://www.w3.org/ns/activitystreams#Public', // TODO figure out how to make these not public
 
 		object: {
 			id: `${domain}/status/${user}/${id}`,
@@ -210,7 +209,8 @@ function postTweet(tweet) {
 			published: new Date(tweet.created_at).toISOString(),
 			attributedTo: `${domain}/users/${user}`,
 			content,
-			to: 'https://www.w3.org/ns/activitystreams#Public', // TODO figure out how to make these not public
+			// to: 'https://www.w3.org/ns/activitystreams#Public', // Public
+			to: [`${domain}/users/${user}/followers`],
 		},
 	};
 

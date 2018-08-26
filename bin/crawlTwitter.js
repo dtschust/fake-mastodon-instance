@@ -182,7 +182,7 @@ function postTweet(tweet) {
 	let content = `<p>${twitter.autoLinkWithJSON(
 		tweet.full_text,
 		tweet.entities,
-	)}</p><p> (🐦🔗 <a href="https://twitter.com/${user}/status/${id}">permalink</a>)</p>`;
+	)}</p><p> (🐦🔗 <a href="https://twitter.com/${user}/status/${id}" class="status-link">permalink</a>)</p>`;
 
 	// Convert @user to look like @user@twitter.com to be less confusing
 	if (entities.user_mentions && entities.user_mentions.length) {

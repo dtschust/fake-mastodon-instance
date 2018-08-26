@@ -16,10 +16,11 @@ const message = {
 		type: 'Note',
 		published: `${new Date().toISOString()}`,
 		attributedTo: `https://fake-mastodon-instance.herokuapp.com/users/${user}`,
-		content: '<p>This is a DM I think?</p>',
+		content: '<p>This is a followers only message</p>',
 		tag: [],
 		// to: 'https://www.w3.org/ns/activitystreams#Public', // public
-		// to: ['https://mastodon.social/users/nuncatest'], // Should send DMs, doesn't work but I don't really care
+		// Below should send DMs, doesn't work but I don't really care. For DM to work it needs to mention the user, and have a tag with a mention in it
+		// to: ['https://mastodon.social/users/nuncatest'],
 		to: [
 			`https://fake-mastodon-instance.herokuapp.com/users/${user}/followers`,
 		],

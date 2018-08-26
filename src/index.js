@@ -144,6 +144,20 @@ app.post('/inbox', (req, res) => {
 		userToRemove = userToRemove[userToRemove.length - 1];
 		console.log(`Request received to unfollow ${userToRemove}`);
 		removeFollowerFromList(userToRemove);
+	} else if (
+		req.body.type === 'Like' &&
+		req.body.actor === 'https://mastodon.social/users/nuncatest'
+	) {
+		// req.body.object = https://fake-mastodon-instance.herokuapp.com/status/nuncatest/1033582719366643712
+		const status = req.body.object.split('/').slice(-1);
+		console.log(`User liked this status: ${status}`);
+		T.post('favorites/create', { id: status })
+			.then(result => {
+				console.log('SUCCESS!', result.data);
+			})
+			.catch(e => {
+				console.log('Error liking status', e);
+			});
 	}
 
 	// Ignore anything that doesn't come from my account, hardcoded for now

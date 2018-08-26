@@ -62,6 +62,17 @@ function addNewFollowerToList(username) {
 	});
 }
 
+function removeFollowerFromList(username) {
+	// store the new user to follow, if we aren't already storing them!
+	FollowingUsernameModel.deleteOne({ username }, err => {
+		if (err) {
+			console.log(`Error deleting ${username}`);
+			return;
+		}
+		console.log(`Success! Unfollowed ${username}`);
+	});
+}
+
 const app = express();
 
 const domain = process.env.DOMAIN;
@@ -91,10 +102,9 @@ app.post('/inbox', (req, res) => {
 `,
 		JSON.stringify(req.body),
 	);
-	// TODO: verify signature or whatever.
+	// TODO: validate signature I guess
 
 	console.log('HEADERS:', req.headers);
-	// TODO: validate signature I guess
 	if (req.body.type === 'Follow') {
 		let userToAdd = req.body.object.split('/');
 		userToAdd = userToAdd[userToAdd.length - 1];
@@ -123,10 +133,17 @@ app.post('/inbox', (req, res) => {
 			addNewFollowerToList(userToAdd);
 		}
 		// TODO: Maybe manually trigger a crawl of this user instead of waiting for the crawler
-
-		// TODO: support unfollows
-		// I don't need to send an accept I don't think, since I didn't get one when I did an unfollow.
-		// I just need to unfollow the person
+	} else if (
+		req.body.type === 'Undo' &&
+		req.body.object &&
+		req.body.object.type === 'Follow' &&
+		// Ignore anything that doesn't come from my account, hardcoded for now
+		req.body.actor === 'https://mastodon.social/users/nuncatest'
+	) {
+		let userToRemove = req.body.object.object.split('/');
+		userToRemove = userToRemove[userToRemove.length - 1];
+		console.log(`Request received to unfollow ${userToRemove}`);
+		removeFollowerFromList(userToRemove);
 	}
 
 	// Ignore anything that doesn't come from my account, hardcoded for now

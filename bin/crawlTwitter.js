@@ -235,6 +235,7 @@ function fetchFollowers(prevFollowerIds = [], next_cursor) {
 	if (DEBUG) {
 		return Promise.resolve(mockFollowersArray);
 	}
+	return Promise.resolve(mockFollowersArray);
 
 	// TODO actually fetch the followers, perhaps persisting in a database also
 	// The code is in tweet-test.js, just port it over dude!

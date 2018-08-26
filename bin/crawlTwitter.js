@@ -182,10 +182,7 @@ function postTweet(tweet) {
 	let content = `<p>${twitter.autoLinkWithJSON(
 		tweet.full_text,
 		tweet.entities,
-	)}</p>
-	<p> (🐦🔗 <a href="https://twitter.com/${user}/status/${id}" rel="nofollow noopener" target="_blank"><span class="invisible">http://www.</span><span class="">twitter.com</span><span class="invisible"></span></a></p>
-	<p> <a href="http://www.twitter.com" rel="nofollow noopener" target="_blank"><span class="invisible">http://www.</span><span class="">twitter.com</span><span class="invisible"></span></a></p>
-	`;
+	)}</p><p>🐦 permalink: <a href="https://twitter.com/${user}/status/${id}">www.twitter.com/${user}/status/${id}</a></p>`;
 
 	// Convert @user to look like @user@twitter.com to be less confusing
 	if (entities.user_mentions && entities.user_mentions.length) {
@@ -238,7 +235,6 @@ function fetchFollowers(prevFollowerIds = [], next_cursor) {
 	if (DEBUG) {
 		return Promise.resolve(mockFollowersArray);
 	}
-	return Promise.resolve(mockFollowersArray);
 
 	// TODO actually fetch the followers, perhaps persisting in a database also
 	// The code is in tweet-test.js, just port it over dude!

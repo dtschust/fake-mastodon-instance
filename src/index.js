@@ -82,7 +82,15 @@ app.post('/inbox', (req, res) => {
 	if (req.body.type === 'Delete') {
 		res.status(202).end();
 	}
-	console.log('got an inbox post!', JSON.stringify(req.body));
+	console.log(
+		`got an inbox post of type ${req.body.type}${
+			req.body.object && req.body.object.type
+				? ` subtype ${req.body.object.type}`
+				: ''
+		}!
+`,
+		JSON.stringify(req.body),
+	);
 	// TODO: verify signature or whatever.
 
 	console.log('HEADERS:', req.headers);

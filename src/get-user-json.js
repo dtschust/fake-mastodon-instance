@@ -49,6 +49,14 @@ module.exports = function getUserJson(username, twitterProfile) {
 			owner: `${domain}/users/${username}`,
 			publicKeyPem: process.env.INSTANCE_PUBLIC_KEY,
 		},
+		attachment: [
+			{
+				type: 'PropertyValue',
+				name: 'what?',
+				value:
+					'this is a fake account, acting as a bridge to a real twitter account. You cannot follow it, only the developer can',
+			},
+		],
 	};
 	return userJson;
 };

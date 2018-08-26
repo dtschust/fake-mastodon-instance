@@ -10,10 +10,7 @@ module.exports = function getUserJson(username, twitterProfile) {
 			{
 				manuallyApprovesFollowers: 'as:manuallyApprovesFollowers',
 				sensitive: 'as:sensitive',
-				movedTo: {
-					'@id': 'as:movedTo',
-					'@type': '@id',
-				},
+				movedTo: { '@id': 'as:movedTo', '@type': '@id' },
 				Hashtag: 'as:Hashtag',
 				ostatus: 'http://ostatus.org#',
 				atomUri: 'ostatus:atomUri',
@@ -21,14 +18,8 @@ module.exports = function getUserJson(username, twitterProfile) {
 				conversation: 'ostatus:conversation',
 				toot: 'http://joinmastodon.org/ns#',
 				Emoji: 'toot:Emoji',
-				focalPoint: {
-					'@container': '@list',
-					'@id': 'toot:focalPoint',
-				},
-				featured: {
-					'@id': 'toot:featured',
-					'@type': '@id',
-				},
+				focalPoint: { '@container': '@list', '@id': 'toot:focalPoint' },
+				featured: { '@id': 'toot:featured', '@type': '@id' },
 				schema: 'http://schema.org#',
 				PropertyValue: 'schema:PropertyValue',
 				value: 'schema:value',
@@ -36,6 +27,8 @@ module.exports = function getUserJson(username, twitterProfile) {
 		],
 		id: `${domain}/users/${username}`,
 		type: 'Person',
+		following: `${domain}/users/${username}/following`,
+		followers: `${domain}/users/${username}/followers`,
 		preferredUsername: username,
 		name: `🐧 ${data.name}`,
 		summary: `${
@@ -43,12 +36,7 @@ module.exports = function getUserJson(username, twitterProfile) {
 		} (this is a fake account, acting as a bridge to a real twitter account. You cannot follow it, only the developer can)`,
 		url: `${domain}/@${username}`,
 		manuallyApprovesFollowers: true,
-		image: [
-			{
-				url: `${data.profile_banner_url}`,
-				type: 'Image',
-			},
-		],
+		image: [{ url: `${data.profile_banner_url}`, type: 'Image' }],
 		inbox: `${domain}/inbox`,
 		icon: [
 			{

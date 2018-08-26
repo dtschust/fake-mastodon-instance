@@ -151,7 +151,6 @@ app.get('/@:user', (req, res) => {
 
 app.get('/users/:username', (req, res) => {
 	// TODO: cache these profiles.
-	// TODO: figure out how to invalidate caches for profiles as well, the other instances have their own caches
 	const { username } = req.params;
 	console.log(
 		req.path,
@@ -168,6 +167,206 @@ app.get('/users/:username', (req, res) => {
 			console.log('Error', e);
 			res.status(500).end();
 		});
+});
+
+app.get('/users/:username/followers', (req, res) => {
+	// TODO: cache these profiles.
+	const { username } = req.params;
+	console.log(
+		req.path,
+		`username ${req.params.username} following requested!`,
+		req.query,
+		req.body,
+	);
+	if (!req.query.page) {
+		res.json({
+			'@context': [
+				'https://www.w3.org/ns/activitystreams',
+				'https://w3id.org/security/v1',
+				{
+					manuallyApprovesFollowers: 'as:manuallyApprovesFollowers',
+					sensitive: 'as:sensitive',
+					movedTo: { '@id': 'as:movedTo', '@type': '@id' },
+					Hashtag: 'as:Hashtag',
+					ostatus: 'http://ostatus.org#',
+					atomUri: 'ostatus:atomUri',
+					inReplyToAtomUri: 'ostatus:inReplyToAtomUri',
+					conversation: 'ostatus:conversation',
+					toot: 'http://joinmastodon.org/ns#',
+					Emoji: 'toot:Emoji',
+					focalPoint: { '@container': '@list', '@id': 'toot:focalPoint' },
+					featured: { '@id': 'toot:featured', '@type': '@id' },
+					schema: 'http://schema.org#',
+					PropertyValue: 'schema:PropertyValue',
+					value: 'schema:value',
+				},
+			],
+			id: `https://${domain}/users/${username}/followers`,
+			type: 'OrderedCollection',
+			totalItems: 1,
+			first: `https://${domain}/users/${username}/followers?page=1`,
+		});
+	} else if (req.query.page === '1') {
+		res.json({
+			'@context': [
+				'https://www.w3.org/ns/activitystreams',
+				'https://w3id.org/security/v1',
+				{
+					manuallyApprovesFollowers: 'as:manuallyApprovesFollowers',
+					sensitive: 'as:sensitive',
+					movedTo: { '@id': 'as:movedTo', '@type': '@id' },
+					Hashtag: 'as:Hashtag',
+					ostatus: 'http://ostatus.org#',
+					atomUri: 'ostatus:atomUri',
+					inReplyToAtomUri: 'ostatus:inReplyToAtomUri',
+					conversation: 'ostatus:conversation',
+					toot: 'http://joinmastodon.org/ns#',
+					Emoji: 'toot:Emoji',
+					focalPoint: { '@container': '@list', '@id': 'toot:focalPoint' },
+					featured: { '@id': 'toot:featured', '@type': '@id' },
+					schema: 'http://schema.org#',
+					PropertyValue: 'schema:PropertyValue',
+					value: 'schema:value',
+				},
+			],
+			id: `${domain}/users/${username}/followers?page=1`,
+			type: 'OrderedCollectionPage',
+			totalItems: 1,
+			partOf: `${domain}/users/${username}/followers`,
+			orderedItems: [
+				'https://mastodon.social/users/nuncatest', // TODO: this is hardcoded
+			],
+		});
+	} else {
+		res.json({
+			'@context': [
+				'https://www.w3.org/ns/activitystreams',
+				'https://w3id.org/security/v1',
+				{
+					manuallyApprovesFollowers: 'as:manuallyApprovesFollowers',
+					sensitive: 'as:sensitive',
+					movedTo: { '@id': 'as:movedTo', '@type': '@id' },
+					Hashtag: 'as:Hashtag',
+					ostatus: 'http://ostatus.org#',
+					atomUri: 'ostatus:atomUri',
+					inReplyToAtomUri: 'ostatus:inReplyToAtomUri',
+					conversation: 'ostatus:conversation',
+					toot: 'http://joinmastodon.org/ns#',
+					Emoji: 'toot:Emoji',
+					focalPoint: { '@container': '@list', '@id': 'toot:focalPoint' },
+					featured: { '@id': 'toot:featured', '@type': '@id' },
+					schema: 'http://schema.org#',
+					PropertyValue: 'schema:PropertyValue',
+					value: 'schema:value',
+				},
+			],
+			id: `${domain}/users/${username}/followers?page=${req.query.page}`,
+			type: 'OrderedCollectionPage',
+			totalItems: 1,
+			partOf: `${domain}/users/${username}/followers`,
+			orderedItems: [],
+		});
+	}
+});
+
+app.get('/users/:username/following', (req, res) => {
+	// TODO: cache these profiles.
+	const { username } = req.params;
+	console.log(
+		req.path,
+		`username ${req.params.username} followers requested!`,
+		req.query,
+		req.body,
+	);
+	if (!req.query.page) {
+		res.json({
+			'@context': [
+				'https://www.w3.org/ns/activitystreams',
+				'https://w3id.org/security/v1',
+				{
+					manuallyApprovesFollowers: 'as:manuallyApprovesFollowers',
+					sensitive: 'as:sensitive',
+					movedTo: { '@id': 'as:movedTo', '@type': '@id' },
+					Hashtag: 'as:Hashtag',
+					ostatus: 'http://ostatus.org#',
+					atomUri: 'ostatus:atomUri',
+					inReplyToAtomUri: 'ostatus:inReplyToAtomUri',
+					conversation: 'ostatus:conversation',
+					toot: 'http://joinmastodon.org/ns#',
+					Emoji: 'toot:Emoji',
+					focalPoint: { '@container': '@list', '@id': 'toot:focalPoint' },
+					featured: { '@id': 'toot:featured', '@type': '@id' },
+					schema: 'http://schema.org#',
+					PropertyValue: 'schema:PropertyValue',
+					value: 'schema:value',
+				},
+			],
+			id: `${domain}/users/${username}/following`,
+			type: 'OrderedCollection',
+			totalItems: 1,
+			first: `${domain}/users/${username}/following?page=1`,
+		});
+	} else if (req.query.page === '1') {
+		res.json({
+			'@context': [
+				'https://www.w3.org/ns/activitystreams',
+				'https://w3id.org/security/v1',
+				{
+					manuallyApprovesFollowers: 'as:manuallyApprovesFollowers',
+					sensitive: 'as:sensitive',
+					movedTo: { '@id': 'as:movedTo', '@type': '@id' },
+					Hashtag: 'as:Hashtag',
+					ostatus: 'http://ostatus.org#',
+					atomUri: 'ostatus:atomUri',
+					inReplyToAtomUri: 'ostatus:inReplyToAtomUri',
+					conversation: 'ostatus:conversation',
+					toot: 'http://joinmastodon.org/ns#',
+					Emoji: 'toot:Emoji',
+					focalPoint: { '@container': '@list', '@id': 'toot:focalPoint' },
+					featured: { '@id': 'toot:featured', '@type': '@id' },
+					schema: 'http://schema.org#',
+					PropertyValue: 'schema:PropertyValue',
+					value: 'schema:value',
+				},
+			],
+			id: `${domain}/users/${username}/following?page=1`,
+			type: 'OrderedCollectionPage',
+			totalItems: 1,
+			partOf: `${domain}/users/${username}/following`,
+			orderedItems: [
+				'https://mastodon.social/users/nuncatest', // TODO: this is hardcoded
+			],
+		});
+	} else {
+		res.json({
+			'@context': [
+				'https://www.w3.org/ns/activitystreams',
+				'https://w3id.org/security/v1',
+				{
+					manuallyApprovesFollowers: 'as:manuallyApprovesFollowers',
+					sensitive: 'as:sensitive',
+					movedTo: { '@id': 'as:movedTo', '@type': '@id' },
+					Hashtag: 'as:Hashtag',
+					ostatus: 'http://ostatus.org#',
+					atomUri: 'ostatus:atomUri',
+					inReplyToAtomUri: 'ostatus:inReplyToAtomUri',
+					conversation: 'ostatus:conversation',
+					toot: 'http://joinmastodon.org/ns#',
+					Emoji: 'toot:Emoji',
+					focalPoint: { '@container': '@list', '@id': 'toot:focalPoint' },
+					featured: { '@id': 'toot:featured', '@type': '@id' },
+					schema: 'http://schema.org#',
+					PropertyValue: 'schema:PropertyValue',
+					value: 'schema:value',
+				},
+			],
+			id: `${domain}/users/${username}/following?page=${req.query.page}`,
+			type: 'OrderedCollectionPage',
+			totalItems: 1,
+			partOf: `${domain}/users/${username}/following`,
+			orderedItems: [],
+		});
+	}
 });
 
 app.get('/.well-known/webfinger', (req, res) => {

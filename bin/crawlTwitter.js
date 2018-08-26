@@ -299,7 +299,6 @@ function fetchFollowers(prevFollowerIds = [], next_cursor) {
 	if (DEBUG) {
 		return Promise.resolve(mockFollowersArray);
 	}
-	return Promise.resolve(mockFollowersArray);
 
 	return T.get('friends/list', {
 		screen_name: 'nuncamind',

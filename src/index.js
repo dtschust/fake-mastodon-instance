@@ -148,15 +148,29 @@ app.post('/inbox', (req, res) => {
 		req.body.type === 'Like' &&
 		req.body.actor === 'https://mastodon.social/users/nuncatest'
 	) {
-		// req.body.object = https://fake-mastodon-instance.herokuapp.com/status/nuncatest/1033582719366643712
 		const status = req.body.object.split('/').slice(-1);
 		console.log(`User liked this status: ${status}`);
-		T.post('favorites/create', { id: status })
-			.then(result => {
-				console.log('SUCCESS!', result.data);
+		T.post('favorites/create', { id: status, include_entities: false })
+			.then(() => {
+				console.log('Successfully liked the status on twitter');
 			})
 			.catch(e => {
 				console.log('Error liking status', e);
+			});
+	} else if (
+		req.body.type === 'Undo' &&
+		req.body.object &&
+		req.body.object.type === 'Like' &&
+		req.body.actor === 'https://mastodon.social/users/nuncatest'
+	) {
+		const status = req.body.object.object.split('/').slice(-1);
+		console.log(`User unliked this status: ${status}`);
+		T.post('favorites/destroy', { id: status, include_entities: false })
+			.then(() => {
+				console.log('Successfully unliked the status on twitter');
+			})
+			.catch(e => {
+				console.log('Error unliking status', e);
 			});
 	}
 

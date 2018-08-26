@@ -37,40 +37,110 @@ const FollowingUsernameModel = mongoose.model('FollowingUsername', {
 	username: String,
 });
 
-function addNewFollowerToList(username) {
-	// store the new user to follow, if we aren't already storing them!
-	FollowingUsernameModel.findOne({ username }, (err, response) => {
-		if (err) {
-			console.log(`Error querying the database for ${username}`);
-			return;
-		}
-		if (response) {
-			// Nothing to do, we're already following this person.
-			return;
-		}
+const FollowingEventModel = mongoose.model('FollowingEventModel', {
+	timestamp: Number,
+	id: String,
+});
 
-		const newFollowingUsername = new FollowingUsernameModel({
-			username,
-		});
+const UnfollowingEventModel = mongoose.model('UnfollowingEventModel', {
+	timestamp: Number,
+	id: String,
+});
 
-		newFollowingUsername.save(saveErr => {
-			if (saveErr) {
-				console.log('Error saving to database', saveErr);
+function addNewFollowerToList(username, followerEventId) {
+	FollowingEventModel.findOne(
+		{ id: followerEventId },
+		(followerEventErr, followerEventResp) => {
+			if (followerEventErr) {
+				console.log(
+					`Error querying the database for follower event id ${followerEventId}`,
+				);
+				return;
 			}
-			console.log(`done! Now following ${username}!`);
-		});
-	});
+			if (followerEventResp && followerEventId) {
+				// Nothing to do, we've already acted on this follower event
+				console.log('We have already handled this follow event, ignoring it');
+				return;
+			}
+
+			// store the new user to follow, if we aren't already storing them!
+			FollowingUsernameModel.findOne({ username }, (err, response) => {
+				if (err) {
+					console.log(`Error querying the database for ${username}`);
+					return;
+				}
+				if (response) {
+					// Nothing to do, we're already following this person.
+					return;
+				}
+
+				const newFollowingUsername = new FollowingUsernameModel({
+					username,
+				});
+
+				newFollowingUsername.save(saveErr => {
+					if (saveErr) {
+						console.log('Error saving to database', saveErr);
+					}
+					console.log(`done! Now following ${username}!`);
+					if (followerEventId) {
+						new FollowingEventModel({
+							timestamp: Date.now(),
+							id: followerEventId,
+						}).save(followingEventSaveErr => {
+							if (followingEventSaveErr) {
+								console.log(
+									'Error saving to following events database',
+									followingEventSaveErr,
+								);
+							}
+						});
+					}
+				});
+			});
+		},
+	);
 }
 
-function removeFollowerFromList(username) {
-	// store the new user to follow, if we aren't already storing them!
-	FollowingUsernameModel.deleteOne({ username }, err => {
-		if (err) {
-			console.log(`Error deleting ${username}`);
-			return;
-		}
-		console.log(`Success! Unfollowed ${username}`);
-	});
+function removeFollowerFromList(username, removeFollowerEventId) {
+	UnfollowingEventModel.findOne(
+		{ id: removeFollowerEventId },
+		(removeFollowerEventErr, removeFollowerEventResp) => {
+			if (removeFollowerEventErr) {
+				console.log(
+					`Error querying the database for follower event id ${removeFollowerEventId}`,
+				);
+				return;
+			}
+			if (removeFollowerEventResp && removeFollowerEventId) {
+				// Nothing to do, we've already acted on this undo follower event
+				console.log(
+					'We have already handled this undo follow event, ignoring it',
+				);
+			}
+			// store the new user to follow, if we aren't already storing them!
+			FollowingUsernameModel.deleteOne({ username }, err => {
+				if (err) {
+					console.log(`Error deleting ${username}`);
+					return;
+				}
+				console.log(`Success! Unfollowed ${username}`);
+				if (removeFollowerEventId) {
+					new UnfollowingEventModel({
+						timestamp: Date.now(),
+						id: removeFollowerEventId,
+					}).save(followingEventSaveErr => {
+						if (followingEventSaveErr) {
+							console.log(
+								'Error saving to following events database',
+								followingEventSaveErr,
+							);
+						}
+					});
+				}
+			});
+		},
+	);
 }
 
 const app = express();
@@ -128,7 +198,7 @@ app.post('/inbox', (req, res) => {
 		});
 
 		if (shouldAccept) {
-			addNewFollowerToList(userToAdd);
+			addNewFollowerToList(userToAdd, req.body.id);
 		}
 	} else if (
 		req.body.type === 'Undo' &&
@@ -140,7 +210,7 @@ app.post('/inbox', (req, res) => {
 		let userToRemove = req.body.object.object.split('/');
 		userToRemove = userToRemove[userToRemove.length - 1];
 		console.log(`Request received to unfollow ${userToRemove}`);
-		removeFollowerFromList(userToRemove);
+		removeFollowerFromList(userToRemove, req.body.id);
 	} else if (
 		req.body.type === 'Like' &&
 		req.body.actor === 'https://mastodon.social/users/nuncatest'

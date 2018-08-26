@@ -154,8 +154,9 @@ app.post('/inbox', (req, res) => {
 			.then(() => {
 				console.log('Successfully liked the status on twitter');
 			})
-			.catch(e => {
-				console.log('Error liking status', e);
+			.catch(() => {
+				// Do nothing, because we get duplicate alerts for likes and it errors the second time
+				// console.log('Error liking status', e);
 			});
 	} else if (
 		req.body.type === 'Undo' &&
@@ -169,8 +170,9 @@ app.post('/inbox', (req, res) => {
 			.then(() => {
 				console.log('Successfully unliked the status on twitter');
 			})
-			.catch(e => {
-				console.log('Error unliking status', e);
+			.catch(() => {
+				// Do nothing, because we get duplicate alerts for dislikes and it errors the second time
+				// console.log('Error unliking status', e);
 			});
 	}
 
@@ -178,6 +180,7 @@ app.post('/inbox', (req, res) => {
 	if (req.body.actor !== 'https://mastodon.social/users/nuncatest') {
 		res.status(202).end();
 	}
+	res.status(202).end();
 });
 
 app.get('/status/:user/:id', (req, res) => {

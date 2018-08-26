@@ -102,7 +102,6 @@ app.post('/inbox', (req, res) => {
 `,
 		JSON.stringify(req.body),
 	);
-	// TODO: validate signature I guess
 
 	console.log('HEADERS:', req.headers);
 	if (req.body.type === 'Follow') {
@@ -125,14 +124,12 @@ app.post('/inbox', (req, res) => {
 			},
 		};
 		sendMessage(message, userToAdd, 'mastodon.social', () => {
-			// TODO dynamic domain
 			res.status(202).end();
 		});
 
 		if (shouldAccept) {
 			addNewFollowerToList(userToAdd);
 		}
-		// TODO: Maybe manually trigger a crawl of this user instead of waiting for the crawler
 	} else if (
 		req.body.type === 'Undo' &&
 		req.body.object &&
@@ -206,7 +203,6 @@ app.get('/@:user', (req, res) => {
 });
 
 app.get('/users/:username', (req, res) => {
-	// TODO: cache these profiles.
 	const { username } = req.params;
 	console.log(
 		req.path,
@@ -226,7 +222,6 @@ app.get('/users/:username', (req, res) => {
 });
 
 app.get('/users/:username/followers', (req, res) => {
-	// TODO: cache these profiles.
 	const { username } = req.params;
 	console.log(
 		req.path,
@@ -289,9 +284,7 @@ app.get('/users/:username/followers', (req, res) => {
 			type: 'OrderedCollectionPage',
 			totalItems: 420,
 			partOf: `${domain}/users/${username}/followers`,
-			orderedItems: [
-				'https://mastodon.social/users/nuncatest', // TODO: this is hardcoded
-			],
+			orderedItems: ['https://mastodon.social/users/nuncatest'],
 		});
 	} else {
 		res.json({
@@ -326,7 +319,6 @@ app.get('/users/:username/followers', (req, res) => {
 });
 
 app.get('/users/:username/following', (req, res) => {
-	// TODO: cache these profiles.
 	const { username } = req.params;
 	console.log(
 		req.path,
@@ -389,9 +381,7 @@ app.get('/users/:username/following', (req, res) => {
 			type: 'OrderedCollectionPage',
 			totalItems: 420,
 			partOf: `${domain}/users/${username}/following`,
-			orderedItems: [
-				'https://mastodon.social/users/nuncatest', // TODO: this is hardcoded
-			],
+			orderedItems: ['https://mastodon.social/users/nuncatest'],
 		});
 	} else {
 		res.json({

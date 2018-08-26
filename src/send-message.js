@@ -9,7 +9,7 @@ const cert = process.env.INSTANCE_PRIVATE_KEY;
 module.exports = function sendMessage(message, name, destinationDomain, cb) {
 	const signer = crypto.createSign('sha256');
 	const d = new Date();
-	const stringToSign = `(request-target): post /inbox\nhost: ${destinationDomain}\ndate: ${d.toUTCString()}`; // TODO hardcoded host
+	const stringToSign = `(request-target): post /inbox\nhost: ${destinationDomain}\ndate: ${d.toUTCString()}`;
 	signer.update(stringToSign);
 	signer.end();
 	const signature = signer.sign(cert);

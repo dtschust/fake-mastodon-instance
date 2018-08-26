@@ -18,8 +18,8 @@ const message = {
 		attributedTo: `https://fake-mastodon-instance.herokuapp.com/users/${user}`,
 		content: '<p>This is a DM I think?</p>',
 		tag: [],
-		// to: 'https://www.w3.org/ns/activitystreams#Public', // TODO figure out how to make these not public
-		// to: ['https://mastodon.social/users/nuncatest'], // TODO figure out how to send DMs, but I don't really care
+		// to: 'https://www.w3.org/ns/activitystreams#Public', // public
+		// to: ['https://mastodon.social/users/nuncatest'], // Should send DMs, doesn't work but I don't really care
 		to: [
 			`https://fake-mastodon-instance.herokuapp.com/users/${user}/followers`,
 		],

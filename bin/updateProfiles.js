@@ -54,7 +54,6 @@ FollowingUsernameModel.find(undefined)
 			result => {
 				result.data.forEach(data => {
 					const username = data.screen_name;
-					// TODO: put this in a util file
 					const profileUpdate = {
 						'@context': [
 							'https://www.w3.org/ns/activitystreams',
@@ -86,7 +85,6 @@ FollowingUsernameModel.find(undefined)
 					userPromises.push(
 						sendMessage(profileUpdate, username, 'mastodon.social').then(
 							body => {
-								// TODO dynamic domain
 								console.log('profile updated!', body);
 							},
 						),

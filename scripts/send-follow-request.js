@@ -21,7 +21,7 @@ console.log(message);
 
 const signer = crypto.createSign('sha256');
 const d = new Date();
-const stringToSign = `(request-target): post /inbox\nhost: ${theirDomain}\ndate: ${d.toUTCString()}`; // TODO hardcoded host
+const stringToSign = `(request-target): post /inbox\nhost: ${theirDomain}\ndate: ${d.toUTCString()}`;
 signer.update(stringToSign);
 signer.end(); // I think this is ok? it used to just be signer.end which would be a noop
 const signature = signer.sign(privkey);

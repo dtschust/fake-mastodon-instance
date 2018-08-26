@@ -38,6 +38,16 @@ const SeenTweetIdModel = mongoose.model('SeenTweetIdModel', {
 	id: Number,
 });
 
+const FollowingEventModel = mongoose.model('FollowingEventModel', {
+	timestamp: Number,
+	id: String,
+});
+
+const UnfollowingEventModel = mongoose.model('UnfollowingEventModel', {
+	timestamp: Number,
+	id: String,
+});
+
 Promise.all([
 	FollowingUsernameModel.find(undefined).exec(),
 	SeenTweetIdModel.find(undefined).exec(),
@@ -124,48 +134,103 @@ Promise.all([
 			process.exit(0);
 		}
 
+		const cullingPromises = [];
 		// Cull out old tweets, delete anything older than 6 hours
-		SeenTweetIdModel.deleteMany(
-			{ timestamp: { $lte: now - 6 * 60 * 60 * 1000 } },
-			err => {
-				if (err) {
-					console.log('Error culling the seen tweet database');
-				}
-			},
+		cullingPromises.push(
+			new Promise(resolve => {
+				SeenTweetIdModel.deleteMany(
+					{
+						timestamp: {
+							$lte: now - 6 * 60 * 60 * 1000,
+						},
+					},
+					err => {
+						if (err) {
+							console.log('Error culling the seen tweet database');
+						}
+						resolve();
+					},
+				);
+			}),
+		);
+		// Cull out old following event ids, delete anything older than 6 hours
+		cullingPromises.push(
+			new Promise(resolve => {
+				FollowingEventModel.deleteMany(
+					{
+						timestamp: {
+							$lte: now - 6 * 60 * 60 * 1000,
+						},
+					},
+					err => {
+						if (err) {
+							console.log('Error culling the seen following event id database');
+						}
+						resolve();
+					},
+				);
+			}),
+		);
+		// Cull out old unfollowing event ids, delete anything older than 6 hours
+		cullingPromises.push(
+			new Promise(resolve => {
+				UnfollowingEventModel.deleteMany(
+					{
+						timestamp: {
+							$lte: now - 6 * 60 * 60 * 1000,
+						},
+					},
+					err => {
+						if (err) {
+							console.log(
+								'Error culling the seen unfollowing event id database',
+							);
+						}
+						resolve();
+					},
+				);
+			}),
 		);
 
 		const seenTweetIdsUpdatesPromises = [];
 		let count = 0;
-		seenTweetIdsToUpdate.forEach(id => {
-			const promise = new Promise(resolve => {
-				// store the new user to follow, if we aren't already storing them!
-				SeenTweetIdModel.findOne({ id }, (err, response) => {
-					if (err) {
-						console.log(`Error querying the database for ${id}`);
-						return;
-					}
-					if (response) {
-						// Nothing to do, we're already storing this tweet.
-						resolve();
-						return;
-					}
+		Promise.all(cullingPromises).then(() => {
+			seenTweetIdsToUpdate.forEach(id => {
+				const promise = new Promise(resolve => {
+					// store the new user to follow, if we aren't already storing them!
+					SeenTweetIdModel.findOne(
+						{
+							id,
+						},
+						(err, response) => {
+							if (err) {
+								console.log(`Error querying the database for ${id}`);
+								return;
+							}
+							if (response) {
+								// Nothing to do, we're already storing this tweet.
+								resolve();
+								return;
+							}
 
-					const newSeenTweetId = new SeenTweetIdModel({
-						id,
-						timestamp: now,
-					});
+							const newSeenTweetId = new SeenTweetIdModel({
+								id,
+								timestamp: now,
+							});
 
-					newSeenTweetId.save(saveErr => {
-						if (saveErr) {
-							console.log('Error saving to database', saveErr);
-						}
-						console.log(`done! Now storing tweet ${id}!`);
-						count += 1;
-						resolve();
-					});
+							newSeenTweetId.save(saveErr => {
+								if (saveErr) {
+									console.log('Error saving to database', saveErr);
+								}
+								console.log(`done! Now storing tweet ${id}!`);
+								count += 1;
+								resolve();
+							});
+						},
+					);
 				});
+				seenTweetIdsUpdatesPromises.push(promise);
 			});
-			seenTweetIdsUpdatesPromises.push(promise);
 		});
 
 		Promise.all(seenTweetIdsUpdatesPromises).then(() => {

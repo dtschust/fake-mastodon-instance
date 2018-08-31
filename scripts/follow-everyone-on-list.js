@@ -1,6 +1,5 @@
 require('dotenv').config();
 const Twit = require('twit');
-// eslint-disable-next-line import/no-extraneous-dependencies
 const request = require('request');
 
 const T = new Twit({

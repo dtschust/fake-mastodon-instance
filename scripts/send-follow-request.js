@@ -1,6 +1,5 @@
 require('dotenv').config();
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 const request = require('request');
 const crypto = require('crypto');
 

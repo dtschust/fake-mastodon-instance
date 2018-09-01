@@ -170,7 +170,7 @@ app.use((req, res, next) => {
 	// Don't allow user to hit Heroku now that we have a domain
 	const host = req.get('Host');
 	if (host === 'fake-mastodon-instance.herokuapp.com') {
-		return res.redirect(301, `https://toot.rip/${req.originalUrl}`);
+		return res.redirect(301, `https://toot.rip${req.originalUrl}`);
 	}
 	return next();
 });

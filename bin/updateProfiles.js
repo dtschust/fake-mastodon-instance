@@ -2,6 +2,7 @@
 
 require('dotenv').config();
 
+const _ = require('lodash');
 const mongoose = require('mongoose');
 const Twit = require('twit');
 const sendMessage = require('../src/send-message');
@@ -44,14 +45,14 @@ FollowingUsernameModel.find(undefined)
 			);
 		}
 		const userPromises = [];
-		// followingUsernames.forEach(username => {
-		// TODO what if we have more than 100 screen names?
-		if (followingUsernames.length >= 100) {
-			console.log('Cannot update more than 100 right now!');
-			process.exit(0);
-		}
-		T.get('users/lookup', { screen_name: followingUsernames.join(',') }).then(
-			result => {
+
+		const chunks = _.chunk(followingUsernames, 100);
+		const lookups = chunks.map(usernames =>
+			T.get('users/lookup', { screen_name: usernames.join(',') }),
+		);
+
+		Promise.all(lookups).then(responses => {
+			responses.forEach(result => {
 				result.data.forEach(data => {
 					const username = data.screen_name;
 					const profileUpdate = {
@@ -82,23 +83,16 @@ FollowingUsernameModel.find(undefined)
 						to: ['https://www.w3.org/ns/activitystreams#Public'],
 						object: getUserJson(username, data),
 					};
-					// userPromises.push(
-					// 	sendMessage(profileUpdate, username, 'mastodon.social').then(
-					// 		body => {
-					// 			console.log('profile updated!', body);
-					// 		},
-					// 	),
-					// );
 					userPromises.push(
-						sendMessage(profileUpdate, username, 'xoxo.zone').then(body => {
-							console.log('profile updated!', body);
+						sendMessage(profileUpdate, username, 'xoxo.zone').then(() => {
+							console.log(`profile ${username} updated!`);
 						}),
 					);
 				});
-				Promise.all(userPromises).then(() => {
-					console.log('Done!');
-					process.exit(0);
-				});
-			},
-		);
+			});
+			Promise.all(userPromises).then(() => {
+				console.log('Done!');
+				process.exit(0);
+			});
+		});
 	});

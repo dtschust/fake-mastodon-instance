@@ -125,10 +125,8 @@ Promise.all([
 		let i = 0;
 		while (i < len) {
 			const tweet = sortedTweetsToPublish[i];
-			console.log('posting tweet', tweet.full_text);
 			// eslint-disable-next-line no-await-in-loop
 			await postTweet(tweet).then(() => {
-				console.log('done!');
 				seenTweetIdsToUpdate.push(tweet.id);
 			});
 			i += 1;

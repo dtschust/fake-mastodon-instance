@@ -88,12 +88,13 @@ const getFollowingById = (
 const getMyFollowing = () =>
 	getLoggedInUserId().then(id => getFollowingById(id, 'xoxo.zone'));
 
-const getTwitterListMembers = T.get('lists/members', {
-	list_id: '14507192',
-	count: 5000,
-});
+const getTwitterListMembers = () =>
+	T.get('lists/members', {
+		list_id: '14507192',
+		count: 5000,
+	});
 
-Promise.all([getMyFollowing(), getTwitterListMembers]).then(
+Promise.all([getMyFollowing(), getTwitterListMembers()]).then(
 	([alreadyFollowing, response]) => {
 		const domain = 'xoxo.zone';
 		const usernames = response.data.users

@@ -7,23 +7,21 @@ const noteId = `toot-${now}`;
 const message = {
 	'@context': 'https://www.w3.org/ns/activitystreams',
 
-	id: `https://fake-mastodon-instance.herokuapp.com/${id}`,
+	id: `https://toot.rip/${id}`,
 	type: 'Create',
-	actor: `https://fake-mastodon-instance.herokuapp.com/users/${user}`,
+	actor: `https://toot.rip/users/${user}`,
 
 	object: {
-		id: `https://fake-mastodon-instance.herokuapp.com/${noteId}`,
+		id: `https://toot.rip/${noteId}`,
 		type: 'Note',
 		published: `${new Date().toISOString()}`,
-		attributedTo: `https://fake-mastodon-instance.herokuapp.com/users/${user}`,
+		attributedTo: `https://toot.rip/users/${user}`,
 		content: '<p>This is a followers only message</p>',
 		tag: [],
 		// to: 'https://www.w3.org/ns/activitystreams#Public', // public
 		// Below should send DMs, doesn't work but I don't really care. For DM to work it needs to mention the user, and have a tag with a mention in it
 		// to: ['https://mastodon.social/users/nuncatest'],
-		to: [
-			`https://fake-mastodon-instance.herokuapp.com/users/${user}/followers`,
-		],
+		to: [`https://toot.rip/users/${user}/followers`],
 	},
 };
 

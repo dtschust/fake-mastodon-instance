@@ -50,11 +50,7 @@ const getAlreadyFollowing = new Promise((resolve, reject) => {
 							}
 
 							const alreadyFollowing = followingBody
-								.filter(
-									({ acct }) =>
-										acct.split('@')[1] ===
-										'fake-mastodon-instance.herokuapp.com',
-								)
+								.filter(({ acct }) => acct.split('@')[1] === 'toot.rip')
 								.map(({ username }) => username.toLowerCase());
 							resolve(alreadyFollowing);
 						}
@@ -89,7 +85,7 @@ Promise.all([getAlreadyFollowing, getTwitterListMembers]).then(
 						method: 'POST',
 						json: true,
 						body: {
-							uri: `${username}@fake-mastodon-instance.herokuapp.com`,
+							uri: `${username}@toot.rip`,
 						},
 					},
 					(error, mastodonResponse, body) => {

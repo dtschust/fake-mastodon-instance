@@ -3,14 +3,14 @@ require('dotenv').config();
 const request = require('request');
 const crypto = require('crypto');
 
-const domain = 'https://fake-mastodon-instance.herokuapp.com';
+const domain = 'https://toot.rip.herokuapp.com';
 const privkey = process.env.INSTANCE_PRIVATE_KEY;
 const username = 'speakerpaulryan';
 const theirDomain = 'mastodon.social';
 
 const message = {
 	'@context': 'https://www.w3.org/ns/activitystreams',
-	id: `https://fake-mastodon-instance.herokuapp.com/follow-requests/${Date.now()}`,
+	id: `https://toot.rip.herokuapp.com/follow-requests/${Date.now()}`,
 	type: 'Follow',
 	actor: `${domain}/users/${username}`,
 	object: 'https://mastodon.social/users/nuncatest',

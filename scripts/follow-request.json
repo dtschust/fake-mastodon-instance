@@ -1,7 +1,7 @@
 {
 	"@context": "https://www.w3.org/ns/activitystreams",
-	"id": "https://fake-mastodon-instance.herokuapp.com/zmy-first-follow",
+	"id": "https://toot.rip/my-first-follow",
 	"type": "Follow",
-	"actor": "https://fake-mastodon-instance.herokuapp.com/users/dril",
+	"actor": "https://toot.rip/users/dril",
 	"object": "https://mastodon.social/users/nuncatest"
 }

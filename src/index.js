@@ -33,6 +33,13 @@ mongoose.connect(
 	},
 );
 
+const actorWhiteList = [
+	'https://mastodon.social/users/nuncatest',
+	'https://xoxo.zone/users/nuncamind',
+];
+
+const isActorInWhiteList = actor => actorWhiteList.indexOf(actor) !== -1;
+
 const FollowingUsernameModel = mongoose.model('FollowingUsername', {
 	username: String,
 });
@@ -178,8 +185,7 @@ app.post('/inbox', (req, res) => {
 		let userToAdd = req.body.object.split('/');
 		userToAdd = userToAdd[userToAdd.length - 1];
 		console.log('wants to follow', userToAdd);
-		const shouldAccept =
-			req.body.actor === 'https://mastodon.social/users/nuncatest';
+		const shouldAccept = isActorInWhiteList(req.body.actor);
 		const id = Date.now();
 		const message = {
 			'@context': 'https://www.w3.org/ns/activitystreams',
@@ -193,7 +199,12 @@ app.post('/inbox', (req, res) => {
 				object: req.body.object,
 			},
 		};
-		sendMessage(message, userToAdd, 'mastodon.social', () => {
+
+		const domainToRespondTo =
+			req.body.actor.indexOf('mastodon.social') >= 0
+				? 'mastodon.social'
+				: 'xoxo.zone';
+		sendMessage(message, userToAdd, domainToRespondTo, () => {
 			res.status(202).end();
 		});
 
@@ -204,17 +215,14 @@ app.post('/inbox', (req, res) => {
 		req.body.type === 'Undo' &&
 		req.body.object &&
 		req.body.object.type === 'Follow' &&
-		// Ignore anything that doesn't come from my account, hardcoded for now
-		req.body.actor === 'https://mastodon.social/users/nuncatest'
+		// Ignore anything that doesn't come from my account
+		isActorInWhiteList(req.body.actor)
 	) {
 		let userToRemove = req.body.object.object.split('/');
 		userToRemove = userToRemove[userToRemove.length - 1];
 		console.log(`Request received to unfollow ${userToRemove}`);
 		removeFollowerFromList(userToRemove, req.body.id);
-	} else if (
-		req.body.type === 'Like' &&
-		req.body.actor === 'https://mastodon.social/users/nuncatest'
-	) {
+	} else if (req.body.type === 'Like' && isActorInWhiteList(req.body.actor)) {
 		const status = req.body.object.split('/').slice(-1);
 		console.log(`User liked this status: ${status}`);
 		T.post('favorites/create', { id: status, include_entities: false })
@@ -229,7 +237,7 @@ app.post('/inbox', (req, res) => {
 		req.body.type === 'Undo' &&
 		req.body.object &&
 		req.body.object.type === 'Like' &&
-		req.body.actor === 'https://mastodon.social/users/nuncatest'
+		isActorInWhiteList(req.body.actor)
 	) {
 		const status = req.body.object.object.split('/').slice(-1);
 		console.log(`User unliked this status: ${status}`);
@@ -244,7 +252,7 @@ app.post('/inbox', (req, res) => {
 	}
 
 	// Ignore anything that doesn't come from my account, hardcoded for now
-	if (req.body.actor !== 'https://mastodon.social/users/nuncatest') {
+	if (!isActorInWhiteList(req.body.actor)) {
 		res.status(202).end();
 	}
 	res.status(202).end();
@@ -354,7 +362,7 @@ app.get('/users/:username/followers', (req, res) => {
 			type: 'OrderedCollectionPage',
 			totalItems: 420,
 			partOf: `${domain}/users/${username}/followers`,
-			orderedItems: ['https://mastodon.social/users/nuncatest'],
+			orderedItems: actorWhiteList,
 		});
 	} else {
 		res.json({
@@ -451,7 +459,7 @@ app.get('/users/:username/following', (req, res) => {
 			type: 'OrderedCollectionPage',
 			totalItems: 420,
 			partOf: `${domain}/users/${username}/following`,
-			orderedItems: ['https://mastodon.social/users/nuncatest'],
+			orderedItems: actorWhiteList,
 		});
 	} else {
 		res.json({

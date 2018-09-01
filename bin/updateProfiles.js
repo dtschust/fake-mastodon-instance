@@ -89,6 +89,11 @@ FollowingUsernameModel.find(undefined)
 							},
 						),
 					);
+					userPromises.push(
+						sendMessage(profileUpdate, username, 'xoxo.zone').then(body => {
+							console.log('profile updated!', body);
+						}),
+					);
 				});
 				Promise.all(userPromises).then(() => {
 					console.log('Done!');

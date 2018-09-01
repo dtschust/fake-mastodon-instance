@@ -4,6 +4,7 @@ const user = 'nuncamind';
 const now = Date.now();
 const id = `post-${now}`;
 const noteId = `toot-${now}`;
+const domain = 'mastodon.social';
 const message = {
 	'@context': 'https://www.w3.org/ns/activitystreams',
 
@@ -25,4 +26,4 @@ const message = {
 	},
 };
 
-sendMessage(message, user, 'mastodon.social');
+sendMessage(message, user, domain);

@@ -292,7 +292,10 @@ function postTweet(tweet) {
 	if (DEBUG) {
 		return Promise.resolve();
 	}
-	return sendMessage(message, user, 'mastodon.social');
+	return Promise.all([
+		sendMessage(message, user, 'mastodon.social'),
+		sendMessage(message, user, 'xoxo.zone'),
+	]);
 }
 // eslint-disable-next-line camelcase
 function fetchFollowers(prevFollowerIds = [], next_cursor) {

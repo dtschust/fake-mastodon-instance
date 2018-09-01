@@ -11,10 +11,12 @@ const T = new Twit({
 	strictSSL: true, // optional - requires SSL certificates to be valid.
 });
 
+const domain = 'mastodon.social';
+
 const getAlreadyFollowing = new Promise((resolve, reject) => {
 	request(
 		{
-			url: `https://mastodon.social/api/v1/accounts/verify_credentials`,
+			url: `https://${domain}/api/v1/accounts/verify_credentials`,
 			headers: {
 				Authorization: `Bearer ${process.env.MASTODON_TOKEN}`,
 			},
@@ -29,7 +31,7 @@ const getAlreadyFollowing = new Promise((resolve, reject) => {
 			} else {
 				request(
 					{
-						url: `https://mastodon.social/api/v1/accounts/${id}/following`,
+						url: `https://${domain}/api/v1/accounts/${id}/following`,
 						headers: {
 							Authorization: `Bearer ${process.env.MASTODON_TOKEN}`,
 						},
@@ -78,7 +80,7 @@ Promise.all([getAlreadyFollowing, getTwitterListMembers]).then(
 			return new Promise((resolve, reject) => {
 				request(
 					{
-						url: `https://mastodon.social/api/v1/follows`,
+						url: `https://${domain}/api/v1/follows`,
 						headers: {
 							Authorization: `Bearer ${process.env.MASTODON_TOKEN}`,
 						},

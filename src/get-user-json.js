@@ -30,7 +30,7 @@ module.exports = function getUserJson(username, twitterProfile) {
 		following: `${domain}/users/${username}/following`,
 		followers: `${domain}/users/${username}/followers`,
 		preferredUsername: username,
-		name: `🐧 ${data.name}`,
+		name: `🤖 ${data.name}`,
 		summary: `${
 			data.description
 		} (this is a fake account, acting as a bridge to a real twitter account. You cannot follow it, only the developer can)`,

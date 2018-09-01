@@ -6,6 +6,7 @@ const DEBUG = !!process.env.DEBUG;
 const twitter = require('twitter-text');
 const mongoose = require('mongoose');
 const Twit = require('twit');
+const _ = require('lodash');
 const sendMessage = require('../src/send-message');
 
 const mockFollowersArray = require('../src/mock-followers-array');
@@ -74,8 +75,8 @@ Promise.all([
 
 	const userPromises = [];
 	const now = Date.now();
+	const tweetsToPublish = [];
 	followingUsernames.forEach(followerUsername => {
-		const tweetsForUserPromises = [];
 		userPromises.push(
 			T.get('statuses/user_timeline', {
 				screen_name: followerUsername,
@@ -85,8 +86,7 @@ Promise.all([
 				tweet_mode: 'extended',
 			})
 				.then(result => {
-					const tweetsInReverseOrder = result.data.slice().reverse();
-					tweetsInReverseOrder.forEach(tweet => {
+					result.data.forEach(tweet => {
 						if (seenTweetIds[tweet.id]) {
 							// Already posted this tweet, move along!
 							return;
@@ -106,24 +106,34 @@ Promise.all([
 						) {
 							// don't post tweet if it's in reply to someone
 							// @nuncamind doesn't follow!
-							return;
 						}
 
-						tweetsForUserPromises.push(
-							postTweet(tweet).then(() => {
-								// console.log('post tweet complete!');
-								seenTweetIdsToUpdate.push(tweet.id);
-							}),
-						);
+						tweetsToPublish.push(tweet);
 					});
-					return Promise.all(tweetsForUserPromises);
 				})
 				.catch(e => {
 					console.log('ERROR!', followerUsername, e);
 				}),
 		);
 	});
-	Promise.all(userPromises).then(() => {
+	Promise.all(userPromises).then(async () => {
+		const sortedTweetsToPublish = _.sortBy(tweetsToPublish, 'created_at');
+
+		// Publish the tweets one a time, oldest first. This is to try
+		// and keep the timeline sorted
+		const len = sortedTweetsToPublish.length;
+		let i = 0;
+		while (i < len) {
+			const tweet = sortedTweetsToPublish[i];
+			console.log('posting tweet', tweet.full_text);
+			// eslint-disable-next-line no-await-in-loop
+			await postTweet(tweet).then(() => {
+				console.log('done!');
+				seenTweetIdsToUpdate.push(tweet.id);
+			});
+			i += 1;
+		}
+
 		if (!seenTweetIdsToUpdate.length) {
 			console.log('no updates!');
 			process.exit(0);

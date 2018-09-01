@@ -23,27 +23,6 @@ function grabLinkHeader(body, response) {
 	return retBody;
 }
 
-const getAccountIdByUsername = (username, domain) =>
-	rp({
-		url: `https://xoxo.zone/api/v1/accounts/search?q=${username}${encodeURI(
-			'@',
-		)}${domain}`,
-		headers: {
-			Authorization: `Bearer ${process.env.NUNCAMIND_XOXO_TOKEN}`,
-		},
-		method: 'GET',
-		json: true,
-	}).then(resp => {
-		if (resp.length !== 1) {
-			throw new Error(
-				`Unexpected number of results for user search! Got ${
-					resp.length
-				} responses for ${username}@${domain}`,
-			);
-		}
-		return resp[0].id;
-	});
-
 const getLoggedInUserId = () =>
 	rp({
 		url: 'https://xoxo.zone/api/v1/accounts/verify_credentials',
@@ -100,12 +79,11 @@ const getFollowingById = (
 const getMyFollowing = () =>
 	getLoggedInUserId().then(id => getFollowingById(id, 'xoxo.zone'));
 
-// getMyFollowing();
-
-const getFollowingPainfully = (
+const getFollowingForAnotherUser = (
 	username,
 	domain,
-	url = `https://${domain}/users/${username}/following?page=1`,
+	url = console.log(`Fetching followers for ${username}@${domain}`) ||
+		`https://${domain}/users/${username}/following?page=1`,
 	followingUris = [],
 ) =>
 	rp({
@@ -115,7 +93,13 @@ const getFollowingPainfully = (
 		// eslint-disable-next-line no-param-reassign
 		followingUris = followingUris.concat(body.orderedItems);
 		if (body.next) {
-			return getFollowingPainfully(username, domain, body.next, followingUris);
+			console.log('...');
+			return getFollowingForAnotherUser(
+				username,
+				domain,
+				body.next,
+				followingUris,
+			);
 		}
 		return followingUris
 			.map(uri => {
@@ -134,11 +118,6 @@ const getFollowingPainfully = (
 			.filter(a => a);
 	});
 
-// const getOtherPersonFollowing = (username, domain) =>
-// 	getAccountIdByUsername(username, domain).then(id =>
-// 		getFollowingById(id, domain),
-// 	);
-
 const followUsername = async username =>
 	rp({
 		url: `https://xoxo.zone/api/v1/follows`,
@@ -154,26 +133,35 @@ const followUsername = async username =>
 
 Promise.all([
 	getMyFollowing(),
-	getFollowingPainfully('mathowie', 'mastodon.cloud'),
+	getFollowingForAnotherUser('mrssoup', 'niu.moe'),
 ]).then(async ([myFollowing, theirFollowing]) => {
 	const toFollow = _.difference(theirFollowing, myFollowing);
 	console.log(`Trying to follow ${toFollow.length} folk(s)`);
 	const failedFollows = [];
+	const toFollowChunks = _.chunk(toFollow, 20);
 	let i = 0;
-	const len = toFollow.length;
+	const len = toFollowChunks.length;
 	while (i < len) {
-		const username = toFollow[i];
-		let success;
-		console.log(`#${i}/${len}: Following ${username}...`);
-		try {
-			// eslint-disable-next-line no-await-in-loop
-			await followUsername(username);
-			success = true;
-		} catch (err) {
-			console.log(`ERROR: Failed to follow ${username}`);
-			failedFollows.push(username);
-		}
-		if (success) console.log(`Successfully followed ${username}`);
+		const chunk = toFollowChunks[i];
+		console.log(`======================
+Following batch ${i + 1} of ${len}`);
+		// eslint-disable-next-line no-await-in-loop
+		await Promise.all(
+			// eslint-disable-next-line no-loop-func
+			chunk.map(async username => {
+				let success;
+				console.log(`Following ${username}...`);
+				try {
+					// eslint-disable-next-line no-await-in-loop
+					await followUsername(username);
+					success = true;
+				} catch (err) {
+					console.log(`ERROR: Failed to follow ${username}`);
+					failedFollows.push(username);
+				}
+				if (success) console.log(`Successfully followed ${username}`);
+			}),
+		);
 		i += 1;
 	}
 

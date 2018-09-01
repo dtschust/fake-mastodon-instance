@@ -1,4 +1,5 @@
 require('dotenv').config();
+const _ = require('lodash');
 const Twit = require('twit');
 const rp = require('request-promise');
 
@@ -10,6 +11,8 @@ const T = new Twit({
 	timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
 	strictSSL: true, // optional - requires SSL certificates to be valid.
 });
+
+const LIST_ID = 10;
 
 function grabLinkHeader(body, response) {
 	let retBody = body;
@@ -46,7 +49,7 @@ const getLoggedInUserId = () =>
 const getFollowingById = (
 	id,
 	domain,
-	url = `https://${domain}/api/v1/accounts/${id}/following`,
+	url = `https://${domain}/api/v1/accounts/${id}/following?limit=80`,
 	followingUsernames = [],
 ) => {
 	console.log('fetching', url);
@@ -65,9 +68,7 @@ const getFollowingById = (
 		.then(followingBody => {
 			// eslint-disable-next-line no-param-reassign
 			followingUsernames = followingUsernames.concat(
-				followingBody
-					.filter(({ acct }) => acct.split('@')[1] === 'toot.rip')
-					.map(({ username }) => username.toLowerCase()),
+				followingBody.filter(({ acct }) => acct.split('@')[1] === 'toot.rip'),
 			);
 			if (followingBody.nextUrl) {
 				return getFollowingById(
@@ -85,8 +86,15 @@ const getFollowingById = (
 		});
 };
 
-const getMyFollowing = () =>
-	getLoggedInUserId().then(id => getFollowingById(id, 'xoxo.zone'));
+let myFollowingPromise;
+
+const getMyFollowing = () => {
+	if (myFollowingPromise) return myFollowingPromise;
+	myFollowingPromise = getLoggedInUserId().then(id =>
+		getFollowingById(id, 'xoxo.zone'),
+	);
+	return myFollowingPromise;
+};
 
 const getTwitterListMembers = () =>
 	T.get('lists/members', {
@@ -94,8 +102,42 @@ const getTwitterListMembers = () =>
 		count: 5000,
 	});
 
+const updateMyList = async (additionalIds = []) => {
+	const following = await getMyFollowing();
+	const ids = following.map(({ id }) => id);
+	const currentList = await rp({
+		url: `https://xoxo.zone/api/v1/lists/${LIST_ID}/accounts?limit=0`,
+		headers: {
+			Authorization: `Bearer ${process.env.MASTODON_TOKEN}`,
+		},
+		method: 'GET',
+		json: true,
+	});
+	const currentIds = currentList.map(({ id }) => id);
+	const idsToAdd = _.difference(ids, currentIds).concat(additionalIds);
+	if (idsToAdd.length) {
+		await rp({
+			url: `https://xoxo.zone/api/v1/lists/${LIST_ID}/accounts`,
+			headers: {
+				Authorization: `Bearer ${process.env.MASTODON_TOKEN}`,
+			},
+			method: 'POST',
+			json: true,
+			body: {
+				account_ids: idsToAdd,
+			},
+		});
+		console.log(`Done! Added ${idsToAdd.length} new members to the list`);
+	} else {
+		console.log('No one to add to the list!');
+	}
+};
+
 Promise.all([getMyFollowing(), getTwitterListMembers()]).then(
-	([alreadyFollowing, response]) => {
+	([following, response]) => {
+		const alreadyFollowing = following.map(({ username }) =>
+			username.toLowerCase(),
+		);
 		const domain = 'xoxo.zone';
 		const usernames = response.data.users
 			// eslint-disable-next-line camelcase
@@ -104,6 +146,7 @@ Promise.all([getMyFollowing(), getTwitterListMembers()]).then(
 				username => alreadyFollowing.indexOf(username.toLowerCase()) === -1,
 			);
 		console.log('to follow: ', usernames, usernames.length);
+		const idsToAddToList = [];
 		Promise.all(
 			usernames.map(username =>
 				rp({
@@ -117,7 +160,8 @@ Promise.all([getMyFollowing(), getTwitterListMembers()]).then(
 						uri: `${username}@toot.rip`,
 					},
 				})
-					.then(() => {
+					.then(({ id }) => {
+						idsToAddToList.push(id);
 						console.log(`Successfully followed ${username}!`);
 					})
 					.catch(error => {
@@ -125,8 +169,12 @@ Promise.all([getMyFollowing(), getTwitterListMembers()]).then(
 						throw error;
 					}),
 			),
-		).then(() => {
-			console.log('done!');
+		).then(async () => {
+			console.log('waiting five seconds before updating the list...');
+			setTimeout(async () => {
+				await updateMyList(idsToAddToList);
+				console.log('done!');
+			}, 5000);
 		});
 	},
 );

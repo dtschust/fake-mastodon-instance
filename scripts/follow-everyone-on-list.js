@@ -11,7 +11,7 @@ const T = new Twit({
 	strictSSL: true, // optional - requires SSL certificates to be valid.
 });
 
-const domain = 'mastodon.social';
+const domain = 'xoxo.zone';
 
 const getAlreadyFollowing = new Promise((resolve, reject) => {
 	request(

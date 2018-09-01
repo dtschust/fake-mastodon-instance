@@ -13,7 +13,7 @@ const message = {
 	id: `https://toot.rip.herokuapp.com/follow-requests/${Date.now()}`,
 	type: 'Follow',
 	actor: `${domain}/users/${username}`,
-	object: 'https://mastodon.social/users/nuncatest',
+	object: 'https://xoxo.zone/users/nuncamind',
 };
 
 console.log(message);

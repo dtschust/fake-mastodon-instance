@@ -293,7 +293,7 @@ function postTweet(tweet) {
 		return Promise.resolve();
 	}
 	return Promise.all([
-		sendMessage(message, user, 'mastodon.social'),
+		// sendMessage(message, user, 'mastodon.social'),
 		sendMessage(message, user, 'xoxo.zone'),
 	]);
 }

@@ -82,13 +82,13 @@ FollowingUsernameModel.find(undefined)
 						to: ['https://www.w3.org/ns/activitystreams#Public'],
 						object: getUserJson(username, data),
 					};
-					userPromises.push(
-						sendMessage(profileUpdate, username, 'mastodon.social').then(
-							body => {
-								console.log('profile updated!', body);
-							},
-						),
-					);
+					// userPromises.push(
+					// 	sendMessage(profileUpdate, username, 'mastodon.social').then(
+					// 		body => {
+					// 			console.log('profile updated!', body);
+					// 		},
+					// 	),
+					// );
 					userPromises.push(
 						sendMessage(profileUpdate, username, 'xoxo.zone').then(body => {
 							console.log('profile updated!', body);

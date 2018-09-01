@@ -4,7 +4,7 @@ const user = 'nuncamind';
 const now = Date.now();
 const id = `post-${now}`;
 const noteId = `toot-${now}`;
-const domain = 'mastodon.social';
+const domain = 'xoxo.zone';
 const message = {
 	'@context': 'https://www.w3.org/ns/activitystreams',
 
@@ -21,7 +21,7 @@ const message = {
 		tag: [],
 		// to: 'https://www.w3.org/ns/activitystreams#Public', // public
 		// Below should send DMs, doesn't work but I don't really care. For DM to work it needs to mention the user, and have a tag with a mention in it
-		// to: ['https://mastodon.social/users/nuncatest'],
+		// to: ['https://xoxo.zone/users/nuncamind'],
 		to: [`https://toot.rip/users/${user}/followers`],
 	},
 };

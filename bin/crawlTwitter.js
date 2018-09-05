@@ -106,6 +106,7 @@ Promise.all([
 						) {
 							// don't post tweet if it's in reply to someone
 							// @nuncamind doesn't follow!
+							return;
 						}
 
 						tweetsToPublish.push(tweet);

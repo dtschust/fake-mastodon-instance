@@ -16,15 +16,15 @@ const T = new Twit({
 T.get(
 	'statuses/user_timeline',
 	{
-		screen_name: 'trinandtonic',
+		screen_name: 'zdfs',
 		count: 10,
 		include_rts: true,
-		exclude_replies: false,
+		exclude_replies: true,
 		tweet_mode: 'extended',
 		trim_user: true,
 	},
 	(err, data /* , response */) => {
-		console.log(JSON.stringify(data[9]));
+		console.log(JSON.stringify(data[3]));
 	},
 );
 

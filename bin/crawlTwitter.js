@@ -101,6 +101,7 @@ Promise.all([
 						}
 
 						if (
+							!tweet.quoted_status && // if it's a quoted status show it regardless
 							tweet.in_reply_to_user_id &&
 							followerIds.indexOf(tweet.in_reply_to_user_id) === -1
 						) {
@@ -255,8 +256,18 @@ function postTweet(tweet) {
 	let content = `<p>${twitter.autoLinkWithJSON(
 		tweet.full_text,
 		tweet.entities,
-	)}</p><p>🐦 <a href="https://twitter.com/${user}/status/${id}">permalink<span class="invisible">: www.twitter.com/${user}/status/${id}</status></a></p>`;
+	)}</p>`;
 
+	// Add quote tweet if it exists
+	if (tweet.quoted_status) {
+		content += `<p>---</p><p>${twitter.autoLinkWithJSON(
+			tweet.quoted_status.full_text,
+			tweet.quoted_status.entities,
+		)}</p>`;
+	}
+
+	// add permalink
+	content += `</p><p>🐦 <a href="https://twitter.com/${user}/status/${id}">permalink<span class="invisible">: www.twitter.com/${user}/status/${id}</status></a></p>`;
 	// Convert @user to look like @user@twitter.com to be less confusing
 	if (entities.user_mentions && entities.user_mentions.length) {
 		entities.user_mentions.forEach(({ screenName }) => {

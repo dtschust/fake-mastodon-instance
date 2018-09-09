@@ -298,6 +298,12 @@ function postTweet(tweet) {
 		},
 	};
 
+	if (tweet.in_reply_to_status_id_str) {
+		message.object.inReplyTo = `${domain}/status/${
+			tweet.in_reply_to_screen_name
+		}/${tweet.in_reply_to_status_id_str}`;
+	}
+
 	// iterate through user mentions and add tags to the message object, so
 	// mastodon knows about these mentions
 	const domainWithoutHttps = domain.replace('https://', '');
@@ -310,6 +316,7 @@ function postTweet(tweet) {
 	}
 
 	if (DEBUG) {
+		console.log(message);
 		return Promise.resolve();
 	}
 	return Promise.all([

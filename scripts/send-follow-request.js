@@ -3,7 +3,7 @@ require('dotenv').config();
 const request = require('request');
 const crypto = require('crypto');
 
-const domain = 'https://toot.rip.herokuapp.com';
+const domain = 'https://toot.rip';
 const privkey = process.env.INSTANCE_PRIVATE_KEY;
 const username = 'speakerpaulryan';
 const theirDomain = 'mastodon.social';
@@ -13,7 +13,7 @@ const message = {
 	id: `https://toot.rip.herokuapp.com/follow-requests/${Date.now()}`,
 	type: 'Follow',
 	actor: `${domain}/users/${username}`,
-	object: 'https://xoxo.zone/users/nuncamind',
+	object: 'https://mastodon.social/users/nuncatest',
 };
 
 console.log(message);

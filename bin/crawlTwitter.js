@@ -260,7 +260,9 @@ function postTweet(tweet) {
 
 	// Add quote tweet if it exists
 	if (tweet.quoted_status) {
-		content += `<p>---</p><p>${twitter.autoLinkWithJSON(
+		content += `<p>---</p><p>@${
+			tweet.quoted_status.user.screen_name
+		}:</p><p>${twitter.autoLinkWithJSON(
 			tweet.quoted_status.full_text,
 			tweet.quoted_status.entities,
 		)}</p>`;
